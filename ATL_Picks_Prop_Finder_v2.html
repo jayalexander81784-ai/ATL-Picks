@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ATL Picks Prop Finder — Nov 16, 2026</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #0b1120;
+      color: #f1f5f9;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 16px); }
+  </style>
+</head>
+<body class="min-h-screen pb-28">
+  <!-- Sticky Top Header -->
+  <header class="sticky top-0 z-30 bg-[#0b1120]/95 backdrop-blur-md border-b border-slate-800/80">
+    <div class="max-w-3xl mx-auto px-3 pt-3 pb-2">
+      <div class="flex items-center justify-between gap-2 mb-2.5">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-extrabold text-sm">O</span>
+            <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-white">ATL Picks Prop Finder</h1>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-0.5">Mon, Nov 16 • 8 Games • 90 Players • <span class="text-emerald-400 font-semibold">425 Props (Overs &amp; Unders)</span></p>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button id="viewToggleProps" class="px-2 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition">Props</button>
+          <button id="viewToggleMatchups" class="px-2 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Matchups</button>
+          <button id="viewToggleInjuries" class="px-2 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Injuries</button>
+        </div>
+      </div>
+
+      <!-- Search + Quick Toggles -->
+      <div class="flex items-center gap-2 mb-2">
+        <div class="relative flex-1">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input id="searchInput" type="text" placeholder="Search player or team (e.g. Sengun, BOS)..." class="w-full bg-slate-900 border border-slate-700/80 rounded-xl pl-9 pr-8 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
+          <button id="clearSearchBtn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs font-bold">✕</button>
+        </div>
+        <button id="hideSkipsBtn" class="shrink-0 px-2.5 py-2 rounded-xl text-xs font-semibold border border-slate-700 bg-slate-900 text-slate-300 transition">Hide Skips</button>
+      </div>
+
+      <!-- Game Filter Horizontal Pills -->
+      <div id="gameTabs" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1.5"></div>
+
+      <!-- Stat + Side + Confidence + Sort Row -->
+      <div id="subFilters" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1">
+        <select id="sideFilter" class="bg-slate-900 border border-slate-700/80 rounded-lg px-2 py-1.5 text-xs font-semibold text-emerald-300 focus:outline-none focus:border-emerald-500">
+          <option value="ALL">Side: All (O/U)</option>
+          <option value="Over">Overs Only</option>
+          <option value="Under">Unders Only</option>
+        </select>
+        <select id="layoutSelect" class="bg-slate-900 border border-slate-700/80 rounded-lg px-2 py-1.5 text-xs font-medium text-slate-200 focus:outline-none focus:border-emerald-500">
+          <option value="props">View: All 425 Props</option>
+          <option value="players">View: By Player (90)</option>
+        </select>
+        <select id="statFilter" class="bg-slate-900 border border-slate-700/80 rounded-lg px-2 py-1.5 text-xs font-medium text-slate-200 focus:outline-none focus:border-emerald-500">
+          <option value="ALL">Stat: All</option>
+          <option value="PTS">PTS</option>
+          <option value="REB">REB</option>
+          <option value="AST">AST</option>
+          <option value="R+A">R+A</option>
+          <option value="PRA">PRA</option>
+        </select>
+        <select id="confFilter" class="bg-slate-900 border border-slate-700/80 rounded-lg px-2 py-1.5 text-xs font-medium text-slate-200 focus:outline-none focus:border-emerald-500">
+          <option value="ALL">Tier: All</option>
+          <option value="TOP">Top Plays (High + Med-High)</option>
+          <option value="High">High Only</option>
+          <option value="Med-High">Med-High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low-Med">Low-Med</option>
+          <option value="Skip">Skip</option>
+        </select>
+        <select id="sortSelect" class="bg-slate-900 border border-slate-700/80 rounded-lg px-2 py-1.5 text-xs font-medium text-slate-200 focus:outline-none focus:border-emerald-500">
+          <option value="conf">Sort: Best Confidence</option>
+          <option value="l5diff">Sort: Hottest L5 vs Line</option>
+          <option value="pace">Sort: Highest Pace</option>
+          <option value="dvp">Sort: Softest Opp Def</option>
+          <option value="spread">Sort: Closest Spread</option>
+        </select>
+        <button id="noB2bBtn" class="shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/80 bg-slate-900 text-slate-300 transition">No B2B</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-3xl mx-auto px-3 pt-3">
+    <!-- Summary Strip -->
+    <div id="resultsMeta" class="flex items-center justify-between text-xs text-slate-400 mb-2.5 px-0.5"></div>
+
+    <!-- Props Feed -->
+    <div id="propsFeed" class="space-y-3"></div>
+
+    <!-- Matchups Cheat Sheet -->
+    <div id="matchupsView" class="hidden space-y-3"></div>
+
+    <!-- Full NBA Injury Report View -->
+    <div id="injuriesView" class="hidden space-y-3"></div>
+  </main>
+
+  <!-- Sticky Bottom Slip Bar -->
+  <div id="slipBar" class="fixed bottom-0 inset-x-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 safe-bottom">
+    <div class="max-w-3xl mx-auto px-3 py-2.5 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5">
+        <span id="slipCountBadge" class="inline-flex items-center justify-center min-w-[28px] h-7 px-2 rounded-full bg-emerald-500 text-slate-950 font-extrabold text-xs">0</span>
+        <div>
+          <div class="text-xs font-bold text-white">My Slip Builder</div>
+          <div id="slipSubtext" class="text-[11px] text-slate-400">Tap + Slip on any Over or Under to build</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="openSlipBtn" class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition">View Slip</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slip Drawer Modal -->
+  <div id="slipModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-t-2xl sm:rounded-2xl max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800">
+        <div>
+          <h2 class="text-sm font-extrabold text-white">Your Prop Slip</h2>
+          <p class="text-[11px] text-slate-400">Review legs, game script &amp; B2B flags before locking</p>
+        </div>
+        <button id="closeSlipBtn" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center font-bold">✕</button>
+      </div>
+      <div id="slipList" class="p-4 overflow-y-auto space-y-2.5 flex-1"></div>
+      <div class="px-4 py-3 border-t border-slate-800 flex items-center justify-between gap-2">
+        <button id="clearSlipBtn" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Clear All</button>
+        <button id="copySlipBtn" class="flex-1 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold transition">Copy Slip to Clipboard</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-emerald-500 text-slate-950 font-bold text-xs px-4 py-2 rounded-full shadow-lg"></div>
+
+  <script>
+    const TEAMS = {
+      ORL: { name: "Orlando Magic", rec: "5-7", pace: 97.9, paceRk: 25, defRtg: 114.2, defRk: 15, oppPpg: 112.8, oppPpgRk: 13, rest: "2d Rest", b2b: false },
+      BOS: { name: "Boston Celtics", rec: "11-2", pace: 95.0, paceRk: 30, defRtg: 107.0, defRk: 2, oppPpg: 102.4, oppPpgRk: 1, rest: "0d B2B", b2b: true },
+      CHI: { name: "Chicago Bulls", rec: "3-9", pace: 103.2, paceRk: 1, defRtg: 121.0, defRk: 29, oppPpg: 125.9, oppPpgRk: 30, rest: "1d Rest", b2b: false },
+      CLE: { name: "Cleveland Cavaliers", rec: "7-7", pace: 99.0, paceRk: 14, defRtg: 116.2, defRk: 20, oppPpg: 115.9, oppPpgRk: 19, rest: "1d Rest", b2b: false },
+      MEM: { name: "Memphis Grizzlies", rec: "9-4", pace: 99.4, paceRk: 10, defRtg: 111.5, defRk: 8, oppPpg: 111.7, oppPpgRk: 10, rest: "1d Rest", b2b: false },
+      WAS: { name: "Washington Wizards", rec: "4-10", pace: 98.5, paceRk: 21, defRtg: 118.1, defRk: 25, oppPpg: 118.0, oppPpgRk: 25, rest: "0d B2B", b2b: true },
+      POR: { name: "Portland Trail Blazers", rec: "9-3", pace: 99.3, paceRk: 12, defRtg: 112.6, defRk: 11, oppPpg: 111.8, oppPpgRk: 11, rest: "2d Rest", b2b: false },
+      MIN: { name: "Minnesota Timberwolves", rec: "9-4", pace: 100.4, paceRk: 5, defRtg: 105.5, defRk: 1, oppPpg: 106.8, oppPpgRk: 4, rest: "1d Rest", b2b: false },
+      PHX: { name: "Phoenix Suns", rec: "5-7", pace: 98.6, paceRk: 19, defRtg: 119.0, defRk: 26, oppPpg: 117.3, oppPpgRk: 23, rest: "0d B2B", b2b: true },
+      DEN: { name: "Denver Nuggets", rec: "7-4", pace: 96.7, paceRk: 27, defRtg: 115.6, defRk: 19, oppPpg: 112.8, oppPpgRk: 15, rest: "1d Rest", b2b: false },
+      PHI: { name: "Philadelphia 76ers", rec: "11-3", pace: 99.4, paceRk: 9, defRtg: 111.1, defRk: 7, oppPpg: 110.4, oppPpgRk: 9, rest: "0d B2B", b2b: true },
+      BKN: { name: "Brooklyn Nets", rec: "3-9", pace: 98.8, paceRk: 17, defRtg: 116.8, defRk: 23, oppPpg: 116.4, oppPpgRk: 22, rest: "1d Rest", b2b: false },
+      HOU: { name: "Houston Rockets", rec: "11-3", pace: 96.8, paceRk: 26, defRtg: 111.8, defRk: 9, oppPpg: 108.2, oppPpgRk: 6, rest: "0d B2B", b2b: true },
+      MIA: { name: "Miami Heat", rec: "7-6", pace: 102.0, paceRk: 3, defRtg: 116.5, defRk: 22, oppPpg: 119.8, oppPpgRk: 27, rest: "1d Rest", b2b: false },
+      GSW: { name: "Golden State Warriors", rec: "8-5", pace: 98.3, paceRk: 22, defRtg: 113.4, defRk: 12, oppPpg: 112.4, oppPpgRk: 12, rest: "2d Rest", b2b: false },
+      NOP: { name: "New Orleans Pelicans", rec: "4-10", pace: 100.9, paceRk: 4, defRtg: 121.2, defRk: 30, oppPpg: 124.9, oppPpgRk: 29, rest: "1d Rest", b2b: false }
+    };
+
+    const GAMES = [
+      {
+        id: "ORL@BOS", away: "ORL", home: "BOS", time: "5:00 PM MT", spread: -8.5, spreadLabel: "BOS -8.5", total: 212.5, ml: "BOS -360 / ORL +287", blowout: "High (-8.5)",
+        injuries: "ORL: Banchero, Isaac, Penda, Nelson OUT | BOS: Queta Q (Rest)",
+        script: "Slowest-paced game on the slate (BOS 30th, ORL 25th). Banchero out funnels usage to Wagner, Bane & da Silva; BOS on a B2B."
+      },
+      {
+        id: "CHI@CLE", away: "CHI", home: "CLE", time: "5:00 PM MT", spread: -9.5, spreadLabel: "CLE -9.5", total: 242.5, ml: "CLE -400 / CHI +310", blowout: "High (-9.5)",
+        injuries: "CHI: Wilson OUT, J. Smith Q | CLE: Mobley, Merrill OUT, Tyson D, Watson Q",
+        script: "Highest total on the board (242.5). CHI plays 1st in pace and 30th in Opp PPG; Mitchell & Harden rested Saturday and face a leaky backcourt D."
+      },
+      {
+        id: "MEM@WAS", away: "MEM", home: "WAS", time: "5:00 PM MT", spread: -3.5, spreadLabel: "MEM -3.5", total: 232.5, ml: "MEM -160 / WAS +135", blowout: "Low (-3.5)",
+        injuries: "MEM: Jerome, Pippen, Stewart OUT; Edey, Coward Q | WAS: 0d B2B; T. Johnson Q",
+        script: "Tight -3.5 spread with high 232.5 total. WAS is on a B2B after giving up 147 to HOU; MEM thin at center/guard."
+      },
+      {
+        id: "HOU@MIA", away: "HOU", home: "MIA", time: "5:30 PM MT", spread: -2.5, spreadLabel: "HOU -2.5", total: 230.0, ml: "HOU -142 / MIA +120", blowout: "Low (-2.5)",
+        injuries: "HOU: Adams, Capela, Smart OUT; Amen Q (0d B2B) | MIA: Larsson D, Jovic Q",
+        script: "Competitive -2.5 spread. MIA pushes 3rd-fastest pace and ranks 2nd-softest vs PGs & Cs; HOU missing backup bigs Adams & Capela."
+      },
+      {
+        id: "PHI@BKN", away: "PHI", home: "BKN", time: "5:30 PM MT", spread: -5.5, spreadLabel: "PHI -5.5", total: 225.5, ml: "PHI -225 / BKN +188", blowout: "Moderate (-5.5)",
+        injuries: "PHI: LeBron, Bona, Barlow OUT; Embiid Q (0d B2B) | BKN: Fully Healthy (MPJ back)",
+        script: "LeBron is OUT for PHI on a B2B and Embiid is Questionable, opening massive usage for Maxey, Brown & Edgecombe vs BKN's 23rd-ranked D."
+      },
+      {
+        id: "POR@MIN", away: "POR", home: "MIN", time: "6:00 PM MT", spread: -2.5, spreadLabel: "MIN -2.5", total: 228.5, ml: "MIN -135 / POR +114", blowout: "Low (-2.5)",
+        injuries: "POR: Morant, Sharpe, Krejci OUT | MIN: Edwards, DiVincenzo OUT",
+        script: "Both teams missing star guards (Morant/Sharpe & Edwards/DiVincenzo) on a tight -2.5 spread. Huge usage bumps for LaMelo, Dosunmu, Avdija & Hyland."
+      },
+      {
+        id: "GSW@NOP", away: "GSW", home: "NOP", time: "6:00 PM MT", spread: -3.5, spreadLabel: "GSW -3.5", total: 225.5, ml: "GSW -155 / NOP +130", blowout: "Low (-3.5)",
+        injuries: "GSW: Curry, Butler, Moody, Porzingis OUT | NOP: Murphy, Murray, Mathurin OUT",
+        script: "Injury-ravaged shootout (-3.5). NOP ranks 30th in Def Rtg and 4th in pace; Draymond, Podziemski, Zion & Fears carry massive usage."
+      },
+      {
+        id: "PHX@DEN", away: "PHX", home: "DEN", time: "7:00 PM MT", spread: -10.5, spreadLabel: "DEN -10.5", total: 228.5, ml: "DEN -461 / PHX +360", blowout: "High (-10.5)",
+        injuries: "PHX: Mark Williams OUT (0d B2B) | DEN: Strawther OUT",
+        script: "Biggest spread on the slate (DEN -10.5) with PHX on a B2B in altitude and missing C Mark Williams (28th vs C PTS). Watch 4th-quarter starter minutes."
+      }
+    ];
+
+
+    const INJURIES = [
+      {
+        game: "ORL@BOS", time: "5:00 PM MT",
+        awayTeam: "ORL", awayList: [
+          { name: "Paolo Banchero", status: "OUT", reason: "Right high ankle sprain" },
+          { name: "Jonathan Isaac", status: "OUT", reason: "Left knee injury management" },
+          { name: "Noah Penda", status: "OUT", reason: "Right partially torn hamstring" },
+          { name: "Izaiyah Nelson", status: "OUT", reason: "Left ankle injury recovery" }
+        ],
+        homeTeam: "BOS", homeList: [
+          { name: "Neemias Queta", status: "Questionable", reason: "Rest (0d B2B)" }
+        ],
+        beneficiaries: "Franz Wagner, Desmond Bane, Anthony Black & Tristan da Silva soak up Banchero's usage; Mitchell Robinson/Luka Garza get C run if Queta rests."
+      },
+      {
+        game: "CHI@CLE", time: "5:00 PM MT",
+        awayTeam: "CHI", awayList: [
+          { name: "Caleb Wilson", status: "OUT", reason: "Right metacarpal fracture (18.9 PPG)" },
+          { name: "Tobe Awaka", status: "OUT", reason: "Disc irritation" },
+          { name: "Jalen Smith", status: "Questionable", reason: "Left finger sprain" }
+        ],
+        homeTeam: "CLE", homeList: [
+          { name: "Evan Mobley", status: "OUT", reason: "Left great toe sprain" },
+          { name: "Sam Merrill", status: "OUT", reason: "Right elbow injury management" },
+          { name: "Nae'Qwan Tomlin", status: "OUT", reason: "Low back stress reaction" },
+          { name: "Jaylon Tyson", status: "Doubtful", reason: "Right ankle injury management" },
+          { name: "Peyton Watson", status: "Questionable", reason: "Right abdominal soreness" }
+        ],
+        beneficiaries: "Buzelis, Powell & Giddey absorb Wilson's 18.9 PPG; Mitchell, Harden (rested Sat) & Jarrett Allen get huge usage/minutes with Mobley OUT."
+      },
+      {
+        game: "MEM@WAS", time: "5:00 PM MT",
+        awayTeam: "MEM", awayList: [
+          { name: "Ty Jerome", status: "OUT", reason: "Right hip soreness" },
+          { name: "Scotty Pippen Jr.", status: "OUT", reason: "Lumbar disc herniation" },
+          { name: "Isaiah Stewart", status: "OUT", reason: "Illness" },
+          { name: "GG Jackson", status: "OUT", reason: "Left 5th metatarsal fracture" },
+          { name: "Richie Saunders", status: "OUT", reason: "Right knee surgery" },
+          { name: "Zach Edey", status: "Questionable", reason: "Left ankle injury management" },
+          { name: "Quinten Post", status: "Questionable", reason: "Concussion protocol" },
+          { name: "Cedric Coward", status: "Questionable", reason: "Wrist" }
+        ],
+        homeTeam: "WAS", homeList: [
+          { name: "Justin Champagnie", status: "OUT", reason: "Right foot surgery" },
+          { name: "Tristan Vukcevic", status: "OUT", reason: "Left hip impingement" },
+          { name: "Reece Beekman", status: "OUT", reason: "Right AC joint injury" },
+          { name: "Jamir Watkins", status: "OUT", reason: "Left ACL repair" },
+          { name: "Tre Johnson", status: "Questionable", reason: "Low back soreness" }
+        ],
+        beneficiaries: "Cameron Boozer & Coward (if active) carry extra usage/rebounding with Jerome & Stewart out; Anthony Davis & Trae Young are active on WAS B2B."
+      },
+      {
+        game: "HOU@MIA", time: "5:30 PM MT",
+        awayTeam: "HOU", awayList: [
+          { name: "Steven Adams", status: "OUT", reason: "Left lower leg management" },
+          { name: "Clint Capela", status: "OUT", reason: "Right ankle sprain" },
+          { name: "Marcus Smart", status: "OUT", reason: "League suspension" },
+          { name: "Amen Thompson", status: "Questionable", reason: "Left knee soreness (0d B2B)" }
+        ],
+        homeTeam: "MIA", homeList: [
+          { name: "Pelle Larsson", status: "Doubtful", reason: "Illness" },
+          { name: "Nikola Jovic", status: "Questionable", reason: "Illness" },
+          { name: "Klay Thompson", status: "Available", reason: "Left ankle sprain (cleared)" }
+        ],
+        beneficiaries: "Alperen Sengun, Tari Eason & Giannis/Bam dominate the glass with Adams & Capela OUT; Fred VanVleet returns fresh after resting Sunday."
+      },
+      {
+        game: "PHI@BKN", time: "5:30 PM MT",
+        awayTeam: "PHI", awayList: [
+          { name: "LeBron James", status: "OUT", reason: "Low back/sciatica management (0d B2B)" },
+          { name: "Adem Bona", status: "OUT", reason: "Cervical spine sprain" },
+          { name: "Dominick Barlow", status: "OUT", reason: "Low back stress reaction" },
+          { name: "Ariel Hukporti", status: "OUT", reason: "Right Achilles tear" },
+          { name: "Joel Embiid", status: "Questionable", reason: "Right foot plantar fascia (0d B2B)" }
+        ],
+        homeTeam: "BKN", homeList: [
+          { name: "Michael Porter Jr.", status: "Available", reason: "Returns (personal reasons)" }
+        ],
+        beneficiaries: "Tyrese Maxey, Jaylen Brown & VJ Edgecombe get massive usage with LeBron OUT (and even more if Embiid sits); Day'Ron Sharpe feasts if Embiid sits."
+      },
+      {
+        game: "POR@MIN", time: "6:00 PM MT",
+        awayTeam: "POR", awayList: [
+          { name: "Ja Morant", status: "OUT", reason: "Left hamstring strain" },
+          { name: "Shaedon Sharpe", status: "OUT", reason: "Right knee surgery" },
+          { name: "Vit Krejci", status: "OUT", reason: "Left ankle fracture" },
+          { name: "Chris Youngblood", status: "OUT", reason: "Right heel contusion" }
+        ],
+        homeTeam: "MIN", homeList: [
+          { name: "Anthony Edwards", status: "OUT", reason: "Right knee arthroscopy" },
+          { name: "Donte DiVincenzo", status: "OUT", reason: "Right Achilles repair" },
+          { name: "Jaylen Clark", status: "OUT", reason: "Right hamstring strain" }
+        ],
+        beneficiaries: "Deni Avdija & Damian Lillard run POR's offense; LaMelo Ball, Ayo Dosunmu, Jaden McDaniels & Bones Hyland see huge volume for MIN."
+      },
+      {
+        game: "GSW@NOP", time: "6:00 PM MT",
+        awayTeam: "GSW", awayList: [
+          { name: "Stephen Curry", status: "OUT", reason: "Right oblique tear" },
+          { name: "Jimmy Butler III", status: "OUT", reason: "Right ACL repair" },
+          { name: "Moses Moody", status: "OUT", reason: "Left patellar tendon repair" },
+          { name: "Kristaps Porzingis", status: "OUT", reason: "Not with team" },
+          { name: "Brandon Williams", status: "OUT", reason: "Left hamstring strain" },
+          { name: "Gui Santos", status: "Questionable", reason: "Right ankle inflammation" }
+        ],
+        homeTeam: "NOP", homeList: [
+          { name: "Trey Murphy III", status: "OUT", reason: "Bilateral patellar tendinopathy" },
+          { name: "Dejounte Murray", status: "OUT", reason: "Left ankle sprain" },
+          { name: "Bennedict Mathurin", status: "OUT", reason: "Left plantar fasciitis" },
+          { name: "Bryce McGowens", status: "OUT", reason: "Left elbow infection" },
+          { name: "Trendon Watford", status: "OUT", reason: "Right ankle sprain" }
+        ],
+        beneficiaries: "Draymond Green, Brandin Podziemski & Yaxel Lendeborg carry GSW; Zion Williamson, Jeremiah Fears & Jordan Poole carry NOP."
+      },
+      {
+        game: "PHX@DEN", time: "7:00 PM MT",
+        awayTeam: "PHX", awayList: [
+          { name: "Mark Williams", status: "OUT", reason: "Left shoulder surgery" },
+          { name: "Full PHX Report", status: "Pending", reason: "0d B2B (not yet submitted as of 2:30 PM ET)" }
+        ],
+        homeTeam: "DEN", homeList: [
+          { name: "Julian Strawther", status: "OUT", reason: "Left knee sprain" }
+        ],
+        beneficiaries: "Nikola Jokic dominates inside with Mark Williams OUT; watch PHX's late afternoon B2B report for veteran rest."
+      }
+    ];
+
+    // All 90 players with verified stats, lines, DvP, and Overs-only picks
+    const PLAYERS = [
+      // ORL @ BOS (12)
+      { id: 1, name: "Jayson Tatum", team: "BOS", opp: "ORL", game: "ORL@BOS", pos: "SF", status: "Active", mpg: 33.7, avg: "26.8p / 6.1r / 7.3a", l5: "34, 21, 21, 24, 32 PTS", lines: "PTS 25.5 | REB 6.5 | AST 6.5 | R+A 13.5 | PRA 39.5", pick: "PTS Over 25.5", stat: "PTS", conf: "Medium", dvp: "ORL vs SF: 16th PTS (20.4), 1st REB (6.1)", dvpRank: 16, note: "Averages 26.8 PPG and scored 32 in 1st meeting vs ORL, though BOS B2B & -8.5 spread temper PRA." },
+      { id: 2, name: "Franz Wagner", team: "ORL", opp: "BOS", game: "ORL@BOS", pos: "SF", status: "Active", mpg: 36.8, avg: "24.4p / 6.8r / 8.3a", l5: "15, 30, 33, 38, 35 PTS", lines: "PTS 21.5 | REB 6.5 | AST 6.5 | R+A 12.5 | PRA 34.5", pick: "AST Over 6.5", stat: "AST", conf: "High", dvp: "BOS vs SF: 19th PTS (20.7), 28th REB (9.2)", dvpRank: 19, note: "Playing 36.8 MPG as ORL's primary hub with Banchero out; 8.3 APG season avg and 30+ PTS in 4 straight." },
+      { id: 3, name: "Paul George", team: "BOS", opp: "ORL", game: "ORL@BOS", pos: "PF", status: "Active", mpg: 29.6, avg: "20.6p / 5.4r / 4.0a", l5: "20.6 PPG season", lines: "PTS 18.5 | REB 4.5 | AST 3.5 | R+A 7.5 | PRA 26.5", pick: "PTS Over 18.5", stat: "PTS", conf: "High", dvp: "ORL vs PF: 30th PTS (30.0), 28th AST (5.9)", dvpRank: 30, note: "Dream matchup: ORL ranks dead last (30th) in points allowed to PFs (30.0/48) and 28th in AST." },
+      { id: 4, name: "Desmond Bane", team: "ORL", opp: "BOS", game: "ORL@BOS", pos: "SG", status: "Active", mpg: 34.5, avg: "18.3p / 4.1r / 2.5a", l5: "20, 15, 15, 25, 21 PTS", lines: "PTS 17.5 | REB 4.5 | AST 2.5 | R+A 7.5 | PRA 24.5", pick: "PTS Over 17.5", stat: "PTS", conf: "Med-High", dvp: "BOS vs SG: 14th PTS (23.4), 16th 3PM", dvpRank: 14, note: "Extra perimeter volume with Banchero out; hitting 4.1 3PM/g and cleared 17.5 in 3 of L5." },
+      { id: 5, name: "Anthony Black", team: "ORL", opp: "BOS", game: "ORL@BOS", pos: "SG", status: "Active", mpg: 32.1, avg: "16.3p / 5.6r / 5.4a", l5: "23 PTS in Nov 1 vs BOS", lines: "PTS 13.5 | REB 4.5 | AST 4.5 | R+A 8.5 | PRA 22.5", pick: "REB Over 4.5", stat: "REB", conf: "Med-High", dvp: "BOS vs SG: 6th REB, 16th AST; 1st vs PG PTS", dvpRank: 14, note: "32.1 MPG role with 5.6 RPG & 5.4 APG; cleared 4.5 REB cleanly and scored 23 vs BOS on Nov 1." },
+      { id: 6, name: "Payton Pritchard", team: "BOS", opp: "ORL", game: "ORL@BOS", pos: "PG", status: "Active", mpg: 26.7, avg: "13.1p / 3.2r / 3.8a", l5: "13.1 PPG / 3.8 APG", lines: "PTS 13.5 | REB 3.5 | AST 3.5 | R+A 7.5 | PRA 20.5", pick: "AST Over 3.5", stat: "AST", conf: "Low-Med", dvp: "ORL vs PG: 9th PTS (24.7), 14th AST (7.8)", dvpRank: 14, note: "Averages 3.8 APG off the bench; BOS on a B2B with -8.5 spread could give him extra 4Q run." },
+      { id: 7, name: "Derrick White", team: "BOS", opp: "ORL", game: "ORL@BOS", pos: "PG", status: "Active", mpg: 29.3, avg: "13.0p / 3.0r / 5.0a", l5: "18, 9, 5, 19, 16 PTS", lines: "PTS 12.5 | REB 3.5 | AST 4.5 | R+A 7.5 | PRA 20.5", pick: "AST Over 4.5", stat: "AST", conf: "Med-High", dvp: "ORL vs PG: 9th PTS (24.7), 14th AST (7.8)", dvpRank: 14, note: "Averaging 5.0 APG (6.1 per 36); playmaking is steadier than his streaky scoring vs ORL." },
+      { id: 8, name: "Tristan da Silva", team: "ORL", opp: "BOS", game: "ORL@BOS", pos: "SF", status: "Active", mpg: 30.6, avg: "14.8p / 3.9r / 1.7a", l5: "14.8 PPG in 30.6 MPG", lines: "PTS 12.5 | REB 4.5 | AST 1.5 | R+A 5.5 | PRA 18.5", pick: "PTS Over 12.5", stat: "PTS", conf: "Med-High", dvp: "BOS vs SF: 19th PTS (20.7), 29th 3PM (3.6)", dvpRank: 19, note: "Steps into 30+ min with Banchero out; BOS allows the 2nd-most 3PM per 48 to SFs (29th)." },
+      { id: 9, name: "Wendell Carter Jr.", team: "ORL", opp: "BOS", game: "ORL@BOS", pos: "C", status: "Active", mpg: 32.7, avg: "13.5p / 9.3r / 1.1a", l5: "13.5p / 9.3r season", lines: "PTS 10.5 | REB 8.5 | AST 1.5 | R+A 9.5 | PRA 20.5", pick: "REB Over 8.5", stat: "REB", conf: "Medium", dvp: "BOS vs C: 3rd PTS (17.4), 4th REB (12.8)", dvpRank: 4, note: "9.3 RPG on the year and 32.7 MPG, though BOS is 4th-toughest against center rebounds." },
+      { id: 10, name: "Jalen Suggs", team: "ORL", opp: "BOS", game: "ORL@BOS", pos: "PG", status: "Active", mpg: 30.3, avg: "6.8p / 4.3r / 5.0a", l5: "5.0 APG in 30.3 MPG", lines: "PTS 8.5 | REB 2.5 | AST 3.5 | R+A 6.5 | PRA 15.5", pick: "AST Over 3.5", stat: "AST", conf: "Med-High", dvp: "ORL/BOS PG: BOS 1st PTS, 17th AST (8.1)", dvpRank: 17, note: "Shot is cold (30.6% FG, 6.8 PPG), so avoid PTS and target 5.0 APG against a 3.5 assist line." },
+      { id: 11, name: "Neemias Queta", team: "BOS", opp: "ORL", game: "ORL@BOS", pos: "C", status: "Q - Rest", mpg: 22.0, avg: "9.1p / 6.6r / 1.8a", l5: "11p/13r vs TOR", lines: "PTS 8.5 | REB 6.5 | AST 1.5 | R+A 8.5 | PRA 16.5", pick: "Skip", stat: "Skip", conf: "Skip", dvp: "ORL vs C: 9th PTS (20.0), 9th REB (13.4)", dvpRank: 9, note: "Listed Questionable for rest on the B2B; tough ORL interior defense even if active." },
+      { id: 12, name: "Sam Hauser", team: "BOS", opp: "ORL", game: "ORL@BOS", pos: "PF", status: "Active", mpg: 20.2, avg: "8.1p / 3.3r / 1.0a", l5: "8.1 PPG on 44.6% 3PT", lines: "PTS 6.5 | REB 2.5", pick: "PTS Over 6.5", stat: "PTS", conf: "Med-High", dvp: "ORL vs PF: 30th PTS (30.0), 19th 3PM", dvpRank: 30, note: "Averages 8.1 PPG in 20 MPG; ORL is 30th vs PFs and BOS B2B/-8.5 spread boosts bench run." },
+
+      // CHI @ CLE (11)
+      { id: 13, name: "Donovan Mitchell", team: "CLE", opp: "CHI", game: "CHI@CLE", pos: "SG", status: "Active", mpg: 33.0, avg: "23.0p / 4.9r / 5.6a", l5: "Rested Sat; 18.3 FGA L4", lines: "PTS 26.5 | REB 4.5 | AST 5.5 | R+A 10.5 | PRA 36.5", pick: "PTS Over 26.5", stat: "PTS", conf: "Medium", dvp: "CHI vs SG: 15th PTS (23.4), 25th AST/REB", dvpRank: 15, note: "Rested Saturday, Mobley OUT, and CHI allows 125.9 PPG (30th) at #1 pace—only -9.5 spread caps it." },
+      { id: 14, name: "Norman Powell", team: "CHI", opp: "CLE", game: "CHI@CLE", pos: "SG", status: "Active", mpg: 29.1, avg: "21.1p / 3.0r / 1.8a", l5: "21.1 PPG (1st on CHI)", lines: "PTS 22.5 | REB 2.5 | AST 1.5 | R+A 5.5 | PRA 27.5", pick: "REB Over 2.5", stat: "REB", conf: "Med-High", dvp: "CLE vs SG: 19th PTS (24.7), 15th REB (6.5)", dvpRank: 19, note: "Averages 3.0 RPG in 1st-ranked pace with Caleb Wilson out; 22.5 PTS is slightly above his 21.1 avg." },
+      { id: 15, name: "James Harden", team: "CLE", opp: "CHI", game: "CHI@CLE", pos: "PG", status: "Active", mpg: 32.8, avg: "16.9p / 4.7r / 5.8a", l5: "20p/6r/8a vs MIA; Rested Sat", lines: "PTS 17.5 | REB 4.5 | AST 7.5 | R+A 11.5 | PRA 29.5", pick: "PRA Over 29.5", stat: "PRA", conf: "High", dvp: "CHI vs PG: 30th PTS (33.3), 26th AST (9.0)", dvpRank: 30, note: "Fresh off resting Saturday, Mobley OUT, and CHI is dead last (30th) vs PG scoring and PRA." },
+      { id: 16, name: "Matas Buzelis", team: "CHI", opp: "CLE", game: "CHI@CLE", pos: "PF", status: "Active", mpg: 26.8, avg: "13.7p / 4.8r / 2.0a", l5: "13.7p / 4.8r", lines: "PTS 15.5 | REB 5.5 | AST 2.5 | R+A 7.5 | PRA 23.5", pick: "PTS Over 15.5", stat: "PTS", conf: "Medium", dvp: "CLE vs PF: 24th PTS (25.8), 8th REB (9.9)", dvpRank: 24, note: "Caleb Wilson (18.9 PPG) is OUT with a fractured hand, opening frontcourt shots vs CLE's 24th PF D." },
+      { id: 17, name: "Jarrett Allen", team: "CLE", opp: "CHI", game: "CHI@CLE", pos: "C", status: "Active", mpg: 26.0, avg: "12.5p / 8.3r / 1.4a", l5: "12.5p / 8.3r (64.6% FG)", lines: "PTS 14.5 | REB 9.5 | AST 1.5 | R+A 10.5 | PRA 26.5", pick: "PTS Over 14.5", stat: "PTS", conf: "Med-High", dvp: "CHI vs C: 29th PTS (26.8), 6th REB (13.0)", dvpRank: 29, note: "Mobley OUT locks in 30+ min; CHI ranks 29th in PTS allowed to Centers (26.8/48)." },
+      { id: 18, name: "Jaylon Tyson", team: "CLE", opp: "CHI", game: "CHI@CLE", pos: "SF", status: "Doubtful", mpg: 23.8, avg: "9.5p / 3.1r / 2.5a", l5: "Doubtful - Ankle", lines: "PTS 13.5 | REB 4.5 | AST 2.5 | R+A 7.5 | PRA 20.5", pick: "Skip", stat: "Skip", conf: "Skip", dvp: "CHI vs SF: 20th PTS (20.7)", dvpRank: 20, note: "Listed Doubtful (right ankle) and lines sit well above his 9.5 PPG season average." },
+      { id: 19, name: "Jalen Smith", team: "CHI", opp: "CLE", game: "CHI@CLE", pos: "C", status: "Q - Finger", mpg: 24.7, avg: "13.0p / 7.8r / 2.0a", l5: "7.8 RPG (23rd in NBA)", lines: "PTS 13.5 | REB 7.5 | AST 1.5 | R+A 9.5 | PRA 23.5", pick: "REB Over 7.5", stat: "REB", conf: "Low-Med", dvp: "CLE vs C: 25th PTS (24.4), 18th REB (15.0)", dvpRank: 18, note: "Questionable (left finger sprain); 7.8 RPG clears 7.5 if active with Mobley out for CLE." },
+      { id: 20, name: "Peyton Watson", team: "CLE", opp: "CHI", game: "CHI@CLE", pos: "SF", status: "Q - Ab", mpg: 28.2, avg: "10.4p / 4.5r / 2.7a", l5: "Missed Sat (hamstring)", lines: "PTS 13.5 | REB 4.5 | AST 2.5 | R+A 6.5 | PRA 20.5", pick: "Skip", stat: "Skip", conf: "Skip", dvp: "CHI vs SF: 20th PTS, 30th REB", dvpRank: 20, note: "Questionable (abdominal) and lines are inflated above his 10.4 PPG / 17.6 PRA season averages." },
+      { id: 21, name: "Josh Giddey", team: "CHI", opp: "CLE", game: "CHI@CLE", pos: "PG", status: "Active", mpg: 28.4, avg: "10.4p / 5.3r / 8.5a", l5: "8.5 APG season", lines: "PTS 12.5 | REB 6.5 | AST 8.5 | R+A 15.5 | PRA 27.5", pick: "AST Over 8.5", stat: "AST", conf: "Med-High", dvp: "CLE vs PG: 19th PTS (28.2), 27th AST (9.2)", dvpRank: 27, note: "Averaging 8.5 APG in a 242.5-total track meet; CLE ranks 27th in AST allowed to PGs." },
+      { id: 22, name: "Tre Jones", team: "CHI", opp: "CLE", game: "CHI@CLE", pos: "PG", status: "Active", mpg: 18.9, avg: "10.5p / 2.2r / 3.0a", l5: "10.5 PPG (50% FG)", lines: "PTS 10.5 | REB 2.5 | AST 3.5 | R+A 5.5 | PRA 16.5", pick: "PTS Over 10.5", stat: "PTS", conf: "Medium", dvp: "CLE vs PG: 19th PTS (28.2), 27th AST (9.2)", dvpRank: 19, note: "10.5 PPG in 19 MPG; fast #1 pace + Wilson out + -9.5 spread keep his bench scoring live." },
+      { id: 23, name: "Isaac Okoro", team: "CHI", opp: "CLE", game: "CHI@CLE", pos: "SG", status: "Active", mpg: 21.9, avg: "6.3p / 2.0r / 1.7a", l5: "6.3 PPG / 10.0 PRA", lines: "PTS 8.5 | REB 2.5 | AST 1.5 | R+A 4.5 | PRA 12.5", pick: "Skip", stat: "Skip", conf: "Skip", dvp: "CLE vs SF/SG: 9th / 19th PTS", dvpRank: 9, note: "Defense-first wing averaging 6.3p / 2.0r / 1.7a—well below all listed lines." },
+
+      // MEM @ WAS (5)
+      { id: 24, name: "Anthony Davis", team: "WAS", opp: "MEM", game: "MEM@WAS", pos: "PF", status: "Active (B2B)", mpg: 33.8, avg: "24.7p / 10.3r / 2.3a", l5: "29.6p / 12.0r / 1.8a", lines: "PTS 23.5 | REB 10.5 | AST 2.5 | R+A 12.5 | PRA 36.5", pick: "PTS Over 23.5", stat: "PTS", conf: "Medium", dvp: "MEM vs PF/C: 5th PF PTS, 17th C PTS", dvpRank: 17, note: "Red-hot L5 (29.6 PPG, 12.0 RPG) vs thin MEM frontcourt (Stewart out, Edey Q), tempered by WAS B2B." },
+      { id: 25, name: "Cameron Boozer", team: "MEM", opp: "WAS", game: "MEM@WAS", pos: "PF", status: "Active", mpg: 31.5, avg: "15.5p / 9.7r / 5.2a", l5: "16.2p / 9.6r / 5.6a", lines: "PTS 19.5 | REB 8.5 | AST 5.5 | R+A 14.5 | PRA 34.5", pick: "REB Over 8.5", stat: "REB", conf: "Med-High", dvp: "WAS vs PF: 29th PTS (27.7), 30th REB (13.5)", dvpRank: 30, note: "WAS allows the most PF rebounds in the NBA (30th, 13.5/48) on a B2B; R+A 14.5 is also live." },
+      { id: 26, name: "Trae Young", team: "WAS", opp: "MEM", game: "MEM@WAS", pos: "PG", status: "Active (B2B)", mpg: 35.4, avg: "18.3p / 2.9r / 8.7a", l5: "19.8p / 2.6r / 7.6a", lines: "PTS 19.5 | REB 2.5 | AST 8.5 | R+A 11.5 | PRA 31.5", pick: "AST Over 8.5", stat: "AST", conf: "Medium", dvp: "MEM vs PG: 25th PTS (29.6), 12th AST (7.5)", dvpRank: 25, note: "Top ball-handler matchup vs MEM's drive-heavy leaks, though WAS B2B legs make 8.7 APG steadier." },
+      { id: 27, name: "AJ Dybantsa", team: "WAS", opp: "MEM", game: "MEM@WAS", pos: "SF", status: "Active (B2B)", mpg: 33.5, avg: "15.1p / 6.2r / 2.2a", l5: "13.8p / 7.0r / 2.6a", lines: "PTS 16.5 | REB 5.5 | AST 2.5 | R+A 7.5 | PRA 24.5", pick: "REB Over 5.5", stat: "REB", conf: "Medium", dvp: "MEM vs SF: 22nd PTS (21.2), 26th REB (8.8)", dvpRank: 26, note: "Playing 33–36 MPG and averaging 7.0 RPG over L5; MEM ranks 26th in SF rebounds allowed." },
+      { id: 28, name: "Cedric Coward", team: "MEM", opp: "WAS", game: "MEM@WAS", pos: "SG", status: "Q - Wrist", mpg: 28.8, avg: "13.8p / 8.8r / 3.1a", l5: "13.0p / 8.4r / 3.6a (23/12 last)", lines: "PTS 15.5 | REB 7.5 | AST 3.5 | R+A 10.5 | PRA 26.5", pick: "REB Over 7.5", stat: "REB", conf: "Med-High", dvp: "WAS vs SG: 6th PTS (22.6), 24th REB (7.3)", dvpRank: 24, note: "Questionable (wrist), but 8.8 RPG season avg & WAS 24th vs SG boards make 7.5 REB strong if active." },
+
+      // POR @ MIN (12)
+      { id: 29, name: "Deni Avdija", team: "POR", opp: "MIN", game: "POR@MIN", pos: "PF", status: "Active", mpg: 32.7, avg: "23.9p / 6.1r / 6.3a", l5: "24.6p / 5.6r / 6.0a", lines: "PTS 23.5 | REB 6.5 | AST 5.5 | R+A 12.5 | PRA 36.5", pick: "AST Over 5.5", stat: "AST", conf: "Med-High", dvp: "MIN vs PF: 1st PTS (18.2), 5th AST (3.5)", dvpRank: 1, note: "Morant & Sharpe OUT make Deni POR's main creator (6.3 APG season, 6.0 L5) despite MIN's #1 Def Rtg." },
+      { id: 30, name: "Damian Lillard", team: "POR", opp: "MIN", game: "POR@MIN", pos: "PG", status: "Active", mpg: 29.4, avg: "20.6p / 3.1r / 4.3a", l5: "21.2p / 1.6r / 4.6a", lines: "PTS 20.5 | REB 3.5 | AST 4.5 | R+A 7.5 | PRA 28.5", pick: "PTS Over 20.5", stat: "PTS", conf: "Low-Med", dvp: "MIN vs PG: 21st PTS (28.6), 9th AST (7.2)", dvpRank: 21, note: "High usage with Morant/Sharpe out and 21.2 PPG L5, though MIN's #1 overall defense caps upside." },
+      { id: 31, name: "LaMelo Ball", team: "MIN", opp: "POR", game: "POR@MIN", pos: "PG", status: "Active", mpg: 27.7, avg: "18.6p / 3.6r / 6.2a", l5: "21.4p / 3.6r / 6.8a", lines: "PTS 20.5 | REB 4.5 | AST 6.5 | R+A 10.5 | PRA 31.5", pick: "PTS Over 20.5", stat: "PTS", conf: "Med-High", dvp: "POR vs PG: 14th PTS (27.1), 1st AST (5.8)", dvpRank: 14, note: "Clear #1 engine for MIN with Edwards & DiVincenzo OUT; averaging 21.4 PPG & 6.8 APG over L5." },
+      { id: 32, name: "Ayo Dosunmu", team: "MIN", opp: "POR", game: "POR@MIN", pos: "SG", status: "Active", mpg: 31.2, avg: "18.5p / 4.6r / 3.5a", l5: "22.0p / 4.2r / 4.0a", lines: "PTS 17.5 | REB 4.5 | AST 3.5 | R+A 7.5 | PRA 24.5", pick: "PTS Over 17.5", stat: "PTS", conf: "High", dvp: "POR vs SG: 1st PTS (20.1), 3rd REB (6.0)", dvpRank: 1, note: "Locked into 32+ MPG without Edwards/DiVincenzo and averaging 22.0 PPG over L5 on 53.1% FG." },
+      { id: 33, name: "Jaden McDaniels", team: "MIN", opp: "POR", game: "POR@MIN", pos: "PF", status: "Active", mpg: 33.4, avg: "17.0p / 6.2r / 3.8a", l5: "17.4p / 6.8r / 4.2a", lines: "PTS 16.5 | REB 5.5 | AST 3.5 | R+A 8.5 | PRA 25.5", pick: "PRA Over 25.5", stat: "PRA", conf: "High", dvp: "POR vs PF: 22nd PTS (25.4), 23rd AST (5.3)", dvpRank: 22, note: "Playing 33+ MPG and clearing 25.5 PRA easily (27.0 season avg, 28.4 L5 avg) vs POR's 22nd PF D." },
+      { id: 34, name: "Jrue Holiday", team: "POR", opp: "MIN", game: "POR@MIN", pos: "PG", status: "Active", mpg: 26.3, avg: "12.8p / 3.4r / 4.0a", l5: "13.6p / 1.8r / 2.8a", lines: "PTS 13.5 | REB 3.5 | AST 3.5 | R+A 7.5 | PRA 20.5", pick: "Skip", stat: "Skip", conf: "Skip", dvp: "MIN vs PG: 21st PTS, 9th AST", dvpRank: 9, note: "26-min bench role against MIN's #1 overall defense leaves thin margin above his lines." },
+      { id: 35, name: "Jonathan Kuminga", team: "MIN", opp: "POR", game: "POR@MIN", pos: "SF", status: "Active", mpg: 30.6, avg: "12.3p / 5.5r / 2.9a", l5: "12.4p / 5.4r / 3.4a", lines: "PTS 13.5 | REB 5.5 | AST 2.5 | R+A 7.5 | PRA 21.5", pick: "AST Over 2.5", stat: "AST", conf: "Low-Med", dvp: "POR vs SF: 2nd PTS (16.5), 7th AST (3.6)", dvpRank: 2, note: "POR is 2nd-toughest vs SF scoring, but Kuminga's 3.4 APG L5 trend gives 2.5 AST a mild look." },
+      { id: 36, name: "Toumani Camara", team: "POR", opp: "MIN", game: "POR@MIN", pos: "SF", status: "Active", mpg: 29.1, avg: "13.2p / 3.3r / 1.4a", l5: "12.4p / 4.0r / 1.6a", lines: "PTS 11.5 | REB 4.5 | AST 1.5 | R+A 5.5 | PRA 17.5", pick: "PTS Over 11.5", stat: "PTS", conf: "Low-Med", dvp: "MIN vs SF: 3rd PTS (16.5), 20th REB (8.3)", dvpRank: 3, note: "Playing 29–36 MPG with POR guards out and clearing 11.5 PTS (13.2 avg), tempered by MIN's #3 SF D." },
+      { id: 37, name: "Donovan Clingan", team: "POR", opp: "MIN", game: "POR@MIN", pos: "C", status: "Active", mpg: 25.3, avg: "11.0p / 10.5r / 1.6a", l5: "11.8p / 10.4r", lines: "PTS 10.5 | REB 11.5 | AST 1.5 | R+A 12.5 | PRA 23.5", pick: "Skip", stat: "Skip", conf: "Skip", dvp: "MIN vs C: 15th PTS (21.7), 7th REB (13.1)", dvpRank: 7, note: "Splits C minutes (~25 MPG) with Williams III against Gobert and MIN's #7 C rebounding D." },
+      { id: 38, name: "Rudy Gobert", team: "MIN", opp: "POR", game: "POR@MIN", pos: "C", status: "Active", mpg: 29.1, avg: "7.3p / 11.4r / 1.6a", l5: "7.2p / 10.6r / 1.8a", lines: "PTS 9.5 | REB 10.5 | AST 1.5 | R+A 11.5 | PRA 21.5", pick: "REB Over 10.5", stat: "REB", conf: "Med-High", dvp: "POR vs C: 30th PTS (27.5), 13th REB (14.5)", dvpRank: 13, note: "11.4 RPG season avg (13.0 R+A) against POR's porous interior defense; skip PTS (7.3 avg)." },
+      { id: 39, name: "Bones Hyland", team: "MIN", opp: "POR", game: "POR@MIN", pos: "PG", status: "Active", mpg: 13.8, avg: "10.0p / 1.4r / 2.8a", l5: "14.2p / 1.8r / 3.4a", lines: "PTS 9.5 | REB 2.5 | AST 2.5 | PRA 14.5", pick: "PTS Over 9.5", stat: "PTS", conf: "Med-High", dvp: "POR vs PG: 14th PTS (27.1), 1st AST (5.8)", dvpRank: 14, note: "Primary bench spark with Edwards/DiVincenzo OUT; averaging 14.2 PPG & 3.4 APG over L5." },
+      { id: 40, name: "Robert Williams III", team: "POR", opp: "MIN", game: "POR@MIN", pos: "C", status: "Active", mpg: 16.5, avg: "7.0p / 6.6r / 0.9a", l5: "7.4p / 6.4r / 1.4a", lines: "PTS 6.5 | REB 6.5", pick: "Skip", stat: "Skip", conf: "Skip", dvp: "MIN vs C: 15th PTS (21.7), 7th REB (13.1)", dvpRank: 7, note: "Capped at ~16.5 MPG behind Clingan facing Gobert's paint presence." },
+
+      // PHX @ DEN (11)
+      { id: 41, name: "Nikola Jokić", team: "DEN", opp: "PHX", game: "PHX@DEN", pos: "C", status: "Active", mpg: 36.5, avg: "23.7p / 10.5r / 9.1a", l5: "25.8p / 11.6r / 9.2a", lines: "PTS 24.5 | REB 12.5 | AST 9.5 | R+A 22.5 | PRA 47.5", pick: "PTS Over 24.5", stat: "PTS", conf: "Med-High", dvp: "PHX vs C: 28th PTS (25.9), 27th REB (17.0)", dvpRank: 28, note: "PHX is missing C Mark Williams (28th vs C PTS) on a B2B; only -10.5 blowout risk caps 4Q run." },
+      { id: 42, name: "Jamal Murray", team: "DEN", opp: "PHX", game: "PHX@DEN", pos: "PG", status: "Active", mpg: 36.5, avg: "25.9p / 5.2r / 6.2a", l5: "26.6p / 4.4r / 6.2a", lines: "PTS 24.5 | REB 4.5 | AST 6.5 | R+A 10.5 | PRA 34.5", pick: "PTS Over 24.5", stat: "PTS", conf: "Med-High", dvp: "PHX vs PG: 20th PTS (28.5), 26th 3PM (4.3)", dvpRank: 20, note: "Scorching hot (49.4% 3PT, 26.6 PPG L5) vs tired PHX perimeter D; watch -10.5 spread." },
+      { id: 43, name: "Devin Booker", team: "PHX", opp: "DEN", game: "PHX@DEN", pos: "PG", status: "Active (B2B)", mpg: 33.5, avg: "24.8p / 2.7r / 5.2a", l5: "24.0p / 2.4r / 5.2a (7a last)", lines: "PTS 22.5 | REB 3.5 | AST 5.5 | R+A 8.5 | PRA 31.5", pick: "AST Over 5.5", stat: "AST", conf: "Medium", dvp: "DEN vs PG: 10th PTS (25.0), 28th AST (9.2)", dvpRank: 28, note: "DEN ranks 28th in AST allowed to PGs (9.2/48); Booker had 7 AST in 28m last night." },
+      { id: 44, name: "Dillon Brooks", team: "PHX", opp: "DEN", game: "PHX@DEN", pos: "SF", status: "Active (B2B)", mpg: 29.2, avg: "13.8p / 3.7r / 1.9a", l5: "8.4p / 3.4r / 0.8a", lines: "PTS 15.5 | REB 3.5 | AST 1.5 | R+A 5.5 | PRA 20.5", pick: "Skip", stat: "Skip", conf: "Skip", dvp: "DEN vs SF: 24th PTS", dvpRank: 24, note: "Ice cold (1 pt in 22m yesterday; 8.4 PPG over L5); all lines sit well above his form." },
+      { id: 45, name: "Miles Bridges", team: "PHX", opp: "DEN", game: "PHX@DEN", pos: "PF", status: "Active (B2B)", mpg: 29.2, avg: "14.6p / 6.9r / 3.1a", l5: "10.6p / 5.6r / 3.0a", lines: "PTS 14.5 | REB 5.5 | AST 2.5 | R+A 8.5 | PRA 23.5", pick: "REB Over 5.5", stat: "REB", conf: "Medium", dvp: "DEN vs PF: 26th PTS (27.0), 24th REB (11.1)", dvpRank: 24, note: "6.9 RPG season avg clears 5.5 against DEN's 24th-ranked PF rebounding D." },
+      { id: 46, name: "Aaron Gordon", team: "DEN", opp: "PHX", game: "PHX@DEN", pos: "PF", status: "Active", mpg: 29.5, avg: "11.0p / 5.0r / 2.0a", l5: "10.4p / 3.8r / 1.0a", lines: "PTS 13.5 | REB 5.5 | AST 2.5 | R+A 7.5 | PRA 21.5", pick: "Skip", stat: "Skip", conf: "Skip", dvp: "PHX vs PF: 15th PTS, 23rd REB", dvpRank: 15, note: "Shooting 39.8% FG and trending below every listed line over L5." },
+      { id: 47, name: "Cameron Johnson", team: "DEN", opp: "PHX", game: "PHX@DEN", pos: "SF", status: "Active", mpg: 28.5, avg: "12.1p / 4.0r / 1.9a", l5: "14.6p / 3.4r / 1.8a", lines: "PTS 12.5 | REB 3.5 | AST 1.5 | R+A 5.5 | PRA 18.5", pick: "PTS Over 12.5", stat: "PTS", conf: "Medium", dvp: "PHX vs SF: 4th PTS (16.6), 7th 3PM", dvpRank: 4, note: "Trending up (14.6 PPG L5) and PHX's B2B legs leave corner threes open." },
+      { id: 48, name: "Christian Braun", team: "DEN", opp: "PHX", game: "PHX@DEN", pos: "SG", status: "Active", mpg: 33.8, avg: "12.8p / 4.4r / 2.3a", l5: "10.0p / 4.8r / 2.4a", lines: "PTS 11.5 | REB 4.5 | AST 2.5 | R+A 6.5 | PRA 18.5", pick: "REB Over 4.5", stat: "REB", conf: "Low-Med", dvp: "PHX vs SG: 26th PTS (26.3), 7th REB (6.2)", dvpRank: 7, note: "Steady 33.8 MPG and 4.8 RPG in L5, though PHX limits SG boards (7th)." },
+      { id: 49, name: "Jalen Green", team: "PHX", opp: "DEN", game: "PHX@DEN", pos: "SG", status: "Active (B2B)", mpg: 26.7, avg: "11.6p / 3.3r / 2.9a", l5: "13.4p / 3.2r / 2.8a", lines: "PTS 11.5 | REB 3.5 | AST 2.5 | R+A 5.5 | PRA 17.5", pick: "PTS Over 11.5", stat: "PTS", conf: "Low-Med", dvp: "DEN vs SG: 3rd PTS (21.0), 15th AST (5.5)", dvpRank: 3, note: "Averaging 13.4 PPG in L5, but DEN is 3rd vs SG scoring and Green played 21m (-30) last night." },
+      { id: 50, name: "Collin Gillespie", team: "PHX", opp: "DEN", game: "PHX@DEN", pos: "PG", status: "Active (B2B)", mpg: 24.8, avg: "9.3p / 2.3r / 4.1a", l5: "8.8p / 4.4r / 3.4a (26/4/4 last)", lines: "PTS 10.5 | REB 3.5 | AST 3.5 | R+A 7.5 | PRA 17.5", pick: "PRA Over 17.5", stat: "PRA", conf: "Low-Med", dvp: "DEN vs PG: 10th PTS, 28th AST (9.2)", dvpRank: 28, note: "Coming off 26/4/4 in 28m vs LAL; benefits from garbage time if DEN pulls away." },
+      { id: 51, name: "DeMar DeRozan", team: "DEN", opp: "PHX", game: "PHX@DEN", pos: "SF", status: "Active", mpg: 23.6, avg: "9.9p / 2.1r / 2.9a", l5: "7.6p / 1.4r / 3.4a", lines: "PTS 9.5 | AST 2.5 | PRA 15.5", pick: "AST Over 2.5", stat: "AST", conf: "Low-Med", dvp: "PHX vs SF: 30th AST (6.8), 4th PTS (16.6)", dvpRank: 30, note: "Bench scoring dipped (7.6 L5), but he's playmaking (3.4 APG L5) vs PHX's 30th SF AST defense." },
+
+      // PHI @ BKN (13)
+      { id: 52, name: "Tyrese Maxey", team: "PHI", opp: "BKN", game: "PHI@BKN", pos: "PG", status: "Active (B2B)", mpg: 36.1, avg: "26.7p / 3.4r / 5.6a", l5: "24.4p / 2.8r / 5.8a", lines: "PTS 25.5 | REB 3.5 | AST 5.5 | R+A 9.5 | PRA 35.5", pick: "PTS Over 25.5", stat: "PTS", conf: "Med-High", dvp: "BKN vs PG: 7th PTS (24.2), 10th AST (7.3)", dvpRank: 7, note: "LeBron OUT and Embiid Q on a B2B spike Maxey's usage against BKN's 23rd-ranked defense." },
+      { id: 53, name: "Jaylen Brown", team: "PHI", opp: "BKN", game: "PHI@BKN", pos: "SF", status: "Active (B2B)", mpg: 34.8, avg: "21.9p / 6.2r / 3.5a", l5: "22.0p / 6.0r / 2.8a", lines: "PTS 22.5 | REB 6.5 | AST 3.5 | R+A 10.5 | PRA 32.5", pick: "PTS Over 22.5", stat: "PTS", conf: "Med-High", dvp: "BKN vs SF: 23rd PTS (21.7), 27th vs SG (26.4)", dvpRank: 23, note: "Extra shot volume with LeBron out vs BKN's 23rd SF / 27th SG scoring defense." },
+      { id: 54, name: "Joel Embiid", team: "PHI", opp: "BKN", game: "PHI@BKN", pos: "C", status: "Q - Foot", mpg: 31.5, avg: "17.9p / 8.8r / 3.7a", l5: "17.2p / 8.4r / 2.4a", lines: "PTS 22.5 | REB 7.5 | AST 3.5 | R+A 11.5 | PRA 33.5", pick: "REB Over 7.5", stat: "REB", conf: "Low-Med", dvp: "BKN vs C: 19th PTS (23.5), 1st REB (10.0)", dvpRank: 1, note: "Questionable on a B2B (rested Sun); shooting 37.4% FG, making 7.5 REB (8.8 avg) the only angle." },
+      { id: 55, name: "Michael Porter Jr.", team: "BKN", opp: "PHI", game: "PHI@BKN", pos: "SG", status: "Active", mpg: 32.6, avg: "21.5p / 7.5r / 1.3a", l5: "22.0p / 7.8r / 1.2a", lines: "PTS 21.5 | REB 6.5 | AST 1.5 | R+A 8.5 | PRA 30.5", pick: "PTS Over 21.5", stat: "PTS", conf: "Medium", dvp: "PHI vs SG: 25th PTS (26.1), 26th REB (7.8)", dvpRank: 25, note: "Returns rested; PHI ranks 25th vs SG PTS and 26th vs SG REB (REB O 6.5 is also live)." },
+      { id: 56, name: "Julius Randle", team: "BKN", opp: "PHI", game: "PHI@BKN", pos: "PF", status: "Active", mpg: 33.0, avg: "19.9p / 6.3r / 5.0a", l5: "18.6p / 4.2r / 5.2a", lines: "PTS 19.5 | REB 6.5 | AST 4.5 | R+A 11.5 | PRA 31.5", pick: "AST Over 4.5", stat: "AST", conf: "Medium", dvp: "PHI vs PF: 16th PTS (23.3), 3rd AST (3.4)", dvpRank: 16, note: "5.0 APG season / 5.2 APG L5; MPJ returning gives Randle another catch-and-shoot target." },
+      { id: 57, name: "VJ Edgecombe", team: "PHI", opp: "BKN", game: "PHI@BKN", pos: "SG", status: "Active (B2B)", mpg: 33.5, avg: "12.8p / 6.2r / 3.7a", l5: "13.2p / 5.0r / 4.8a", lines: "PTS 13.5 | REB 5.5 | AST 3.5 | R+A 9.5 | PRA 23.5", pick: "AST Over 3.5", stat: "AST", conf: "Med-High", dvp: "BKN vs SG: 27th PTS (26.4), 29th 3PM (4.2)", dvpRank: 27, note: "Playing 33.5 MPG with 4.8 APG over L5 as playmaking climbs without LeBron." },
+      { id: 58, name: "Mikel Brown Jr.", team: "BKN", opp: "PHI", game: "PHI@BKN", pos: "PG", status: "Active", mpg: 22.8, avg: "12.0p / 2.0r / 3.6a", l5: "15.2p / 2.0r / 3.8a", lines: "PTS 11.5 | REB 2.5 | AST 3.5 | R+A 5.5 | PRA 17.5", pick: "PTS Over 11.5", stat: "PTS", conf: "Medium", dvp: "PHI vs PG: 3rd PTS (23.2), 8th AST (7.1)", dvpRank: 3, note: "Trending up sharply (15.2 PPG L5), though MPJ returning trims bench usage vs PHI's 7th-ranked D." },
+      { id: 59, name: "Anfernee Simons", team: "PHI", opp: "BKN", game: "PHI@BKN", pos: "SG", status: "Active (B2B)", mpg: 21.3, avg: "10.4p / 2.1r / 1.1a", l5: "8.6p / 2.6r / 1.2a", lines: "PTS 10.5 | REB 3.5 | AST 1.5 | R+A 4.5 | PRA 14.5", pick: "PTS Over 10.5", stat: "PTS", conf: "Low-Med", dvp: "BKN vs SG: 27th PTS, 29th 3PM (4.2)", dvpRank: 27, note: "L5 has been quiet (8.6 PPG), but LeBron out + BKN's 29th-ranked 3PM defense vs SGs give him upside." },
+      { id: 60, name: "Egor Demin", team: "BKN", opp: "PHI", game: "PHI@BKN", pos: "PG", status: "Active", mpg: 23.0, avg: "10.7p / 1.8r / 2.3a", l5: "10.6p / 2.0r / 2.4a", lines: "PTS 9.5 | REB 2.5 | AST 2.5 | R+A 5.5 | PRA 15.5", pick: "PTS Over 9.5", stat: "PTS", conf: "Low-Med", dvp: "PHI vs PG: 3rd PTS (23.2), 8th AST (7.1)", dvpRank: 3, note: "Steady around 10.6 PPG in 23 MPG, though PHI is 3rd-toughest vs PG scoring." },
+      { id: 61, name: "Day'Ron Sharpe", team: "BKN", opp: "PHI", game: "PHI@BKN", pos: "C", status: "Active", mpg: 23.7, avg: "8.8p / 7.2r / 4.2a", l5: "10.8p / 6.8r / 7.4a", lines: "PTS 8.5 | REB 7.5 | AST 3.5 | R+A 11.5 | PRA 20.5", pick: "AST Over 3.5", stat: "AST", conf: "High", dvp: "PHI vs C: 25th AST (5.3), 12th PTS (21.1)", dvpRank: 25, note: "Averaging 7.4 APG over L5 (4.2 season) and PHI ranks 25th in AST allowed to Centers." },
+      { id: 62, name: "Danny Wolf", team: "BKN", opp: "PHI", game: "PHI@BKN", pos: "SF", status: "Active", mpg: 24.3, avg: "10.4p / 6.1r / 2.0a", l5: "11.6p / 7.0r / 2.2a", lines: "PTS 8.5 | REB 5.5 | AST 2.5 | R+A 8.5 | PRA 17.5", pick: "PTS Over 8.5", stat: "PTS", conf: "Med-High", dvp: "PHI vs SF: 10th PTS (19.5), 22nd REB (8.5)", dvpRank: 10, note: "Starting 24+ MPG shooting 46.9% 3PT; clears 8.5 PTS (11.6 L5) & 5.5 REB (7.0 L5) cleanly." },
+      { id: 63, name: "Noah Clowney", team: "BKN", opp: "PHI", game: "PHI@BKN", pos: "PF", status: "Active", mpg: 20.8, avg: "6.8p / 4.6r / 0.8a", l5: "7.8p / 3.8r / 0.8a", lines: "PTS 6.5 | REB 4.5", pick: "PTS Over 6.5", stat: "PTS", conf: "Low-Med", dvp: "PHI vs PF: 16th PTS (23.3)", dvpRank: 16, note: "Slight scoring uptick (7.8 PPG L5), though MPJ's return pushes him back to ~20 bench min." },
+      { id: 64, name: "Dean Wade", team: "PHI", opp: "BKN", game: "PHI@BKN", pos: "PF", status: "Active (B2B)", mpg: 26.1, avg: "4.6p / 4.1r / 1.8a", l5: "5.2p / 5.4r / 1.4a", lines: "PTS 5.5 | REB 4.5 | AST 1.5 | R+A 6.5 | PRA 12.5", pick: "REB Over 4.5", stat: "REB", conf: "Low-Med", dvp: "BKN vs PF: 19th PTS, 16th REB (10.3)", dvpRank: 16, note: "Starts for LeBron (5.4 RPG L5) and gets extra frontcourt min if Embiid sits." },
+
+      // HOU @ MIA (14)
+      { id: 65, name: "Giannis Antetokounmpo", team: "MIA", opp: "HOU", game: "HOU@MIA", pos: "PF", status: "Active", mpg: 32.4, avg: "28.9p / 12.5r / 5.2a", l5: "30.0p / 12.4r / 4.2a", lines: "PTS 27.5 | REB 10.5 | AST 5.5 | R+A 16.5 | PRA 44.5", pick: "REB Over 10.5", stat: "REB", conf: "Med-High", dvp: "HOU vs PF: 4th PTS (20.0), 15th REB (10.3)", dvpRank: 15, note: "Cleared 10.5 REB in 4 of L5 (14, 9, 11, 14, 14); HOU is missing Adams & Capela inside." },
+      { id: 66, name: "Kevin Durant", team: "HOU", opp: "MIA", game: "HOU@MIA", pos: "SF", status: "Active (B2B)", mpg: 33.9, avg: "21.3p / 5.7r / 3.9a", l5: "22.2p / 6.6r / 5.4a", lines: "PTS 22.5 | REB 5.5 | AST 3.5 | R+A 9.5 | PRA 31.5", pick: "AST Over 3.5", stat: "AST", conf: "Med-High", dvp: "MIA vs SF: 12th PTS (19.8), 29th AST (5.6)", dvpRank: 29, note: "Cleared 3.5 AST in 4 of L5 (5.4 APG L5); MIA ranks 29th in AST allowed to SFs at 3rd-fastest pace." },
+      { id: 67, name: "Alperen Sengun", team: "HOU", opp: "MIA", game: "HOU@MIA", pos: "C", status: "Active (B2B)", mpg: 34.6, avg: "22.8p / 9.5r / 7.7a", l5: "23.2p / 10.0r / 7.0a", lines: "PTS 20.5 | REB 9.5 | AST 6.5 | R+A 16.5 | PRA 36.5", pick: "PRA Over 36.5", stat: "PRA", conf: "High", dvp: "MIA vs C: 11th PTS, 22nd REB (15.9), 61.5% FG", dvpRank: 22, note: "Adams & Capela OUT lock in big min (only 28m yesterday); cleared 36.5 PRA in 3 of L4 full games." },
+      { id: 68, name: "Bam Adebayo", team: "MIA", opp: "HOU", game: "HOU@MIA", pos: "C", status: "Active", mpg: 33.8, avg: "19.5p / 8.5r / 3.3a", l5: "20.8p / 9.0r / 3.0a", lines: "PTS 18.5 | REB 8.5 | AST 3.5 | R+A 12.5 | PRA 31.5", pick: "REB Over 8.5", stat: "REB", conf: "Medium", dvp: "HOU vs C: 6th PTS (19.4), 19th REB (15.2)", dvpRank: 19, note: "Playing 35.6 MPG in L5 (9.0 RPG) against a HOU frontcourt missing Adams & Capela." },
+      { id: 69, name: "Amen Thompson", team: "HOU", opp: "MIA", game: "HOU@MIA", pos: "SG", status: "Q - Knee", mpg: 33.4, avg: "15.8p / 7.0r / 3.4a", l5: "16.4p / 8.2r / 3.4a", lines: "PTS 15.5 | REB 7.5 | AST 3.5 | R+A 10.5 | PRA 26.5", pick: "REB Over 7.5", stat: "REB", conf: "Medium", dvp: "MIA vs SG: 30th PTS (27.9), 29th REB (8.1)", dvpRank: 29, note: "Questionable (knee) on B2B. If active, MIA ranks 29th vs SG REB and 30th vs SG PTS." },
+      { id: 70, name: "Jabari Smith Jr.", team: "HOU", opp: "MIA", game: "HOU@MIA", pos: "PF", status: "Active (B2B)", mpg: 33.9, avg: "15.4p / 6.3r / 2.2a", l5: "11.6p / 6.6r / 2.0a", lines: "PTS 15.5 | REB 6.5 | AST 1.5 | R+A 8.5 | PRA 23.5", pick: "Skip", stat: "Skip", conf: "Skip", dvp: "MIA vs PF: 9th PTS (21.3), 5th REB (9.6)", dvpRank: 5, note: "Scoring cooled off (9, 6, 14, 14, 15 in L5) against MIA's 5th-ranked PF rebounding D." },
+      { id: 71, name: "Fred VanVleet", team: "HOU", opp: "MIA", game: "HOU@MIA", pos: "PG", status: "Active", mpg: 30.4, avg: "14.0p / 2.9r / 5.4a", l5: "15.8p / 2.0r / 3.8a (L4)", lines: "PTS 13.5 | REB 3.5 | AST 5.5 | R+A 8.5 | PRA 22.5", pick: "PTS Over 13.5", stat: "PTS", conf: "Med-High", dvp: "MIA vs PG: 29th PTS (32.9), 29th 3PM (5.0)", dvpRank: 29, note: "Fresh legs after resting Sunday and draws MIA's 29th-ranked PG scoring defense." },
+      { id: 72, name: "Davion Mitchell", team: "MIA", opp: "HOU", game: "HOU@MIA", pos: "PG", status: "Active", mpg: 35.8, avg: "16.8p / 2.4r / 9.2a", l5: "19.0p / 3.8r / 10.6a", lines: "PTS 13.5 | REB 2.5 | AST 7.5 | R+A 10.5 | PRA 23.5", pick: "PRA Over 23.5", stat: "PRA", conf: "High", dvp: "HOU vs PG: 17th PTS (27.3), 3rd AST (6.4)", dvpRank: 17, note: "Massive 37.4 MPG floor; cleared 23.5 PRA (28–44) and 7.5 AST in 5 straight games." },
+      { id: 73, name: "Klay Thompson", team: "MIA", opp: "HOU", game: "HOU@MIA", pos: "SG", status: "Active", mpg: 24.4, avg: "15.3p / 1.5r / 2.1a", l5: "17.8p / 1.0r / 3.3a (L4)", lines: "PTS 13.5", pick: "PTS Over 13.5", stat: "PTS", conf: "Low-Med", dvp: "HOU vs SG: 17th PTS (24.0), 13th 3PM", dvpRank: 17, note: "Off injury report with Larsson Doubtful, though boom-or-bust (26, 11, 23, 11 L4)." },
+      { id: 74, name: "Tari Eason", team: "HOU", opp: "MIA", game: "HOU@MIA", pos: "SF", status: "Active (B2B)", mpg: 24.8, avg: "10.8p / 6.2r / 1.3a", l5: "11.8p / 6.6r / 1.4a", lines: "PTS 12.5 | REB 6.5 | AST 1.5 | R+A 7.5 | PRA 21.5", pick: "REB Over 6.5", stat: "REB", conf: "Medium", dvp: "MIA vs SF: 12th PTS, 24th REB (8.6)", dvpRank: 24, note: "Minutes jumped to 30m & 33m in L2 (7 & 11 REB) with Adams/Capela out; extra bump if Amen sits." },
+      { id: 75, name: "Reed Sheppard", team: "HOU", opp: "MIA", game: "HOU@MIA", pos: "PG", status: "Active (B2B)", mpg: 20.5, avg: "9.3p / 1.5r / 2.9a", l5: "7.6p / 0.4r / 2.0a", lines: "PTS 10.5 | REB 2.5 | AST 2.5 | R+A 4.5 | PRA 14.5", pick: "Skip", stat: "Skip", conf: "Skip", dvp: "MIA vs PG: 29th PTS", dvpRank: 29, note: "VanVleet is back, returning Sheppard to a ~19-minute bench role below his lines." },
+      { id: 76, name: "Pelle Larsson", team: "MIA", opp: "HOU", game: "HOU@MIA", pos: "SF", status: "Doubtful", mpg: 29.5, avg: "11.4p / 3.5r / 3.5a", l5: "Doubtful - Illness", lines: "PTS 10.5 | REB 3.5 | AST 2.5 | R+A 6.5 | PRA 17.5", pick: "Skip", stat: "Skip", conf: "Skip", dvp: "HOU vs SF: 7th PTS", dvpRank: 7, note: "Listed Doubtful with an illness (missed Nov 14)." },
+      { id: 77, name: "Andrew Wiggins", team: "MIA", opp: "HOU", game: "HOU@MIA", pos: "SF", status: "Active", mpg: 25.9, avg: "8.8p / 2.8r / 1.6a", l5: "7.8p / 2.8r / 2.0a", lines: "PTS 9.5 | REB 2.5 | AST 1.5 | R+A 4.5 | PRA 13.5", pick: "Skip", stat: "Skip", conf: "Skip", dvp: "HOU vs SF: 7th PTS (18.5)", dvpRank: 7, note: "Low-usage 5th option behind Giannis, Bam, Mitchell & Klay (10, 8, 13, 6, 2 PTS L5)." },
+      { id: 78, name: "Bobby Portis", team: "MIA", opp: "HOU", game: "HOU@MIA", pos: "PF", status: "Active", mpg: 19.7, avg: "6.7p / 5.5r / 1.8a", l5: "4.2p / 2.8r / 1.2a", lines: "PTS 6.5 | REB 4.5", pick: "Skip", stat: "Skip", conf: "Skip", dvp: "HOU vs PF: 4th PTS, 15th REB", dvpRank: 4, note: "Minutes and boards dropped behind Giannis/Bam (4.2 PPG / 2.8 RPG over L5)." },
+
+      // GSW @ NOP (12)
+      { id: 79, name: "Yaxel Lendeborg", team: "GSW", opp: "NOP", game: "GSW@NOP", pos: "PF", status: "Active", mpg: 31.5, avg: "20.2p / 7.4r / 3.5a", l5: "18.2p / 8.0r / 2.8a", lines: "PTS 23.5 | REB 7.5 | AST 4.5 | R+A 11.5 | PRA 35.5", pick: "REB Over 7.5", stat: "REB", conf: "Med-High", dvp: "NOP vs PF: 20th PTS (24.8), 27th REB (11.3)", dvpRank: 27, note: "Scoring lines (23.5/35.5) are priced up; 8.0 RPG L5 vs NOP's 27th PF rebounding D is safer." },
+      { id: 80, name: "Zion Williamson", team: "NOP", opp: "GSW", game: "GSW@NOP", pos: "PF", status: "Active", mpg: 32.6, avg: "21.9p / 5.2r / 2.7a", l5: "25.0p / 4.8r / 2.5a (L4)", lines: "PTS 22.5 | REB 5.5 | AST 3.5 | R+A 8.5 | PRA 31.5", pick: "PTS Over 22.5", stat: "PTS", conf: "Med-High", dvp: "GSW vs PF: 7th PTS (21.1), 10th REB (10.0)", dvpRank: 7, note: "Murphy & Mathurin OUT leave Zion as NOP's #1 scorer; scored 24, 22, 29, 25 in L4 played." },
+      { id: 81, name: "Brandin Podziemski", team: "GSW", opp: "NOP", game: "GSW@NOP", pos: "PG", status: "Active", mpg: 32.4, avg: "16.5p / 4.9r / 3.8a", l5: "15.8p / 4.8r / 2.4a (22, 25 prior)", lines: "PTS 18.5 | REB 5.5 | AST 4.5 | R+A 9.5 | PRA 28.5", pick: "PTS Over 18.5", stat: "PTS", conf: "Med-High", dvp: "NOP vs PG: 27th PTS (32.2), 29th AST (9.6)", dvpRank: 27, note: "Top perimeter scorer with Curry/Butler/Moody OUT vs NOP's 27th PG scoring D & 30th Def Rtg." },
+      { id: 82, name: "Saddiq Bey", team: "NOP", opp: "GSW", game: "GSW@NOP", pos: "SF", status: "Active", mpg: 28.4, avg: "16.5p / 4.1r / 2.3a", l5: "16.6p / 4.2r / 2.6a", lines: "PTS 18.5 | REB 5.5 | AST 2.5 | R+A 7.5 | PRA 26.5", pick: "PTS Over 18.5", stat: "PTS", conf: "Low-Med", dvp: "GSW vs SF: 29th PTS (23.6), 28th AST (5.3)", dvpRank: 29, note: "Heavy minutes (35m, 41m in L2) vs GSW's 29th SF D, though 18.5 is above his 16.6 L5 avg." },
+      { id: 83, name: "Jeremiah Fears", team: "NOP", opp: "GSW", game: "GSW@NOP", pos: "PG", status: "Active", mpg: 29.4, avg: "15.3p / 4.5r / 5.2a", l5: "16.2p / 4.4r / 6.4a", lines: "PTS 17.5 | REB 4.5 | AST 6.5 | R+A 11.5 | PRA 28.5", pick: "AST Over 6.5", stat: "AST", conf: "Med-High", dvp: "GSW vs PG: 5th PTS (24.0), 13th AST (7.6)", dvpRank: 13, note: "Murray OUT puts playmaking on Fears; 6.4 APG L5 (cleared 6.5 in 3 of L5)." },
+      { id: 84, name: "De'Anthony Melton", team: "GSW", opp: "NOP", game: "GSW@NOP", pos: "SG", status: "Active", mpg: 22.1, avg: "9.9p / 4.2r / 2.4a", l5: "8.8p / 3.8r / 2.6a", lines: "PTS 13.5 | REB 4.5 | AST 2.5 | R+A 7.5 | PRA 20.5", pick: "Skip", stat: "Skip", conf: "Skip", dvp: "NOP vs SG: 23rd PTS (25.6)", dvpRank: 23, note: "~21 MPG role; 13.5 PTS and 20.5 PRA are inflated well above his 9.9 PPG / 16.5 PRA averages." },
+      { id: 85, name: "Derik Queen", team: "NOP", opp: "GSW", game: "GSW@NOP", pos: "C", status: "Active", mpg: 21.9, avg: "11.9p / 6.2r / 2.4a", l5: "10.6p / 4.0r / 1.8a", lines: "PTS 10.5 | REB 5.5 | AST 2.5 | R+A 8.5 | PRA 19.5", pick: "PTS Over 10.5", stat: "PTS", conf: "Low-Med", dvp: "GSW vs C: 7th PTS (19.7), 16th REB (14.7)", dvpRank: 7, note: "Missi's return squeezes C minutes/boards; Queen's L5 averages sit right at 10.6 PPG." },
+      { id: 86, name: "Jordan Poole", team: "NOP", opp: "GSW", game: "GSW@NOP", pos: "PG", status: "Active", mpg: 20.4, avg: "9.0p / 1.9r / 3.1a", l5: "12.0p / 1.8r / 3.3a (L4)", lines: "PTS 10.5 | AST 3.5", pick: "PTS Over 10.5", stat: "PTS", conf: "Med-High", dvp: "GSW vs PG: 5th PTS, 13th AST", dvpRank: 13, note: "With Murray/Murphy/Mathurin out, Poole's min jumped to 21–34 MPG and he scored 14, 13, 14 in L3." },
+      { id: 87, name: "Herb Jones", team: "NOP", opp: "GSW", game: "GSW@NOP", pos: "SG", status: "Active", mpg: 23.9, avg: "6.1p / 2.9r / 1.2a", l5: "6.8p / 2.4r / 1.8a", lines: "PTS 8.5 | REB 3.5 | AST 1.5 | R+A 4.5 | PRA 13.5", pick: "Skip", stat: "Skip", conf: "Skip", dvp: "GSW vs SG: 10th PTS (23.0)", dvpRank: 10, note: "Defense-first role with low usage (6.8 PPG / 11.0 PRA in L5)." },
+      { id: 88, name: "Yves Missi", team: "NOP", opp: "GSW", game: "GSW@NOP", pos: "C", status: "Active", mpg: 20.3, avg: "7.3p / 7.7r / 2.0a", l5: "8 REB in 22m (Nov 14)", lines: "PTS 6.5 | REB 6.5 | AST 1.5 | R+A 8.5 | PRA 14.5", pick: "REB Over 6.5", stat: "REB", conf: "Medium", dvp: "GSW vs C: 16th REB (14.7)", dvpRank: 16, note: "Returned Nov 14 for 8 REB in 22m (7.7 RPG season); GSW is small with Porzingis out & Draymond at C." },
+      { id: 89, name: "Draymond Green", team: "GSW", opp: "NOP", game: "GSW@NOP", pos: "C", status: "Active", mpg: 25.8, avg: "3.3p / 4.7r / 7.1a", l5: "3.4p / 4.4r / 8.0a", lines: "PTS 5.5 | REB 4.5 | AST 5.5 | R+A 10.5 | PRA 16.5", pick: "AST Over 5.5", stat: "AST", conf: "High", dvp: "NOP vs C: 24th AST (5.1), 28th REB (17.4)", dvpRank: 24, note: "Averaging 8.0 APG in L5 (cleared 5.5 in 4 of L5); main playmaking hub with Curry & Butler out." },
+      { id: 90, name: "Georges Niang", team: "GSW", opp: "NOP", game: "GSW@NOP", pos: "PF", status: "Active", mpg: 20.0, avg: "7.8p / 3.1r / 1.5a", l5: "8.6p / 3.2r / 1.6a", lines: "PTS 7.5 | REB 2.5", pick: "PTS Over 7.5", stat: "PTS", conf: "Medium", dvp: "NOP vs PF: 20th PTS (24.8), 30th Def Rtg", dvpRank: 20, note: "Extra stretch-4 usage with GSW short-handed; cleared 7.5 PTS in 3 straight full games (9, 11, 13)." }
+    ];
+
+    const CONF_ORDER = { "High": 1, "Med-High": 2, "Medium": 3, "Low-Med": 4, "Skip": 5 };
+
+    function parseSeasonAvg(avgStr) {
+      const m = avgStr.match(/([\d.]+)p\s*\/\s*([\d.]+)r\s*\/\s*([\d.]+)a/);
+      if (!m) return { pts: 0, reb: 0, ast: 0, ra: 0, pra: 0 };
+      const pts = parseFloat(m[1]), reb = parseFloat(m[2]), ast = parseFloat(m[3]);
+      return { pts, reb, ast, ra: +(reb + ast).toFixed(1), pra: +(pts + reb + ast).toFixed(1) };
+    }
+
+    function parseL5Avg(l5Str, season) {
+      const slash = l5Str.match(/([\d.]+)p\s*\/\s*([\d.]+)r\s*\/\s*([\d.]+)a/);
+      if (slash) {
+        const pts = parseFloat(slash[1]), reb = parseFloat(slash[2]), ast = parseFloat(slash[3]);
+        return { pts, reb, ast, ra: +(reb + ast).toFixed(1), pra: +(pts + reb + ast).toFixed(1) };
+      }
+      const nums = l5Str.match(/^\d+(?:,\s*\d+){4}/);
+      if (nums) {
+        const arr = nums[0].split(",").map(Number);
+        const pts = +(arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1);
+        return { ...season, pts, pra: +(pts + season.reb + season.ast).toFixed(1) };
+      }
+      return { ...season };
+    }
+
+    function buildAllProps() {
+      const all = [];
+      PLAYERS.forEach(p => {
+        const season = parseSeasonAvg(p.avg);
+        const l5 = parseL5Avg(p.l5, season);
+        const opp = TEAMS[p.opp];
+        const t = TEAMS[p.team];
+        const g = GAMES.find(x => x.id === p.game);
+        const parts = p.lines.split("|").map(s => s.trim()).filter(Boolean);
+        const isRiskyOut = p.status.includes("Doubtful") || p.status.includes("Q - Rest");
+
+        p.expandedProps = [];
+
+        parts.forEach(part => {
+          const m = part.match(/^(PTS|REB|AST|R\+A|PRA)\s+([\d.]+)$/);
+          if (!m) return;
+          const stat = m[1];
+          const line = parseFloat(m[2]);
+          const key = `${p.id}-${stat}`;
+
+          const statMap = { "PTS": "pts", "REB": "reb", "AST": "ast", "R+A": "ra", "PRA": "pra" };
+          const sk = statMap[stat];
+          const sVal = season[sk];
+          const lVal = l5[sk];
+          let proj = sVal * 0.55 + lVal * 0.45;
+
+          // Matchup & script adjustments
+          if (opp.defRk >= 22) proj *= 1.03;
+          else if (opp.defRk <= 6) proj *= 0.97;
+          if (p.dvpRank >= 22) proj *= 1.03;
+          else if (p.dvpRank <= 6) proj *= 0.97;
+          if (t.b2b && Math.abs(g.spread) >= 8.5 && (stat === "PTS" || stat === "PRA")) proj *= 0.96;
+
+          const diffPct = line > 0 ? ((proj - line) / line) * 100 : 0;
+
+          let side = "Skip";
+          let conf = "Skip";
+          let reason = "";
+
+          // Check if this is the player's primary curated Over pick
+          const curatedMatch = p.pick.match(/^(PTS|REB|AST|R\+A|PRA)\s+Over\s+([\d.]+)$/);
+          if (isRiskyOut) {
+            side = "Skip";
+            conf = "Skip";
+            reason = `${p.status} — wait for active/inactive confirmation.`;
+          } else if (curatedMatch && curatedMatch[1] === stat && p.conf !== "Skip") {
+            side = "Over";
+            conf = p.conf;
+            reason = p.note;
+          } else if (diffPct >= 14) {
+            side = "Over"; conf = "High";
+            reason = `Season ${sVal} / L5 ${lVal} sits well above ${line} line (${p.dvp}).`;
+          } else if (diffPct >= 8) {
+            side = "Over"; conf = "Med-High";
+            reason = `Projects ~${proj.toFixed(1)} vs ${line} line; ${opp.defRk >= 18 ? "soft" : "solid"} #${opp.defRk} opp D.`;
+          } else if (diffPct >= 3.5) {
+            side = "Over"; conf = "Medium";
+            reason = `Slight Over lean (${sVal} season / ${lVal} L5 vs ${line}).`;
+          } else if (diffPct >= 1.2) {
+            side = "Over"; conf = "Low-Med";
+            reason = `Marginal Over lean (${proj.toFixed(1)} proj vs ${line}).`;
+          } else if (diffPct <= -14) {
+            side = "Under"; conf = "High";
+            reason = `Line (${line}) is well above Season ${sVal} / L5 ${lVal}${t.b2b ? " on a B2B" : ""}${Math.abs(g.spread) >= 8.5 ? " with blowout risk" : ""}.`;
+          } else if (diffPct <= -8) {
+            side = "Under"; conf = "Med-High";
+            reason = `Projects ~${proj.toFixed(1)} below ${line} line${opp.defRk <= 10 ? ` vs #${opp.defRk} defense` : ""}.`;
+          } else if (diffPct <= -3.5) {
+            side = "Under"; conf = "Medium";
+            reason = `Under lean: Season ${sVal} / L5 ${lVal} trails ${line} line.`;
+          } else if (diffPct <= -1.2) {
+            side = "Under"; conf = "Low-Med";
+            reason = `Slight Under lean (${proj.toFixed(1)} proj vs ${line}).`;
+          } else {
+            side = "Skip"; conf = "Skip";
+            reason = `Coin-flip line (${line}) right at Season ${sVal} / L5 ${lVal}.`;
+          }
+
+          const propObj = {
+            key,
+            playerId: p.id,
+            name: p.name,
+            team: p.team,
+            opp: p.opp,
+            game: p.game,
+            pos: p.pos,
+            status: p.status,
+            mpg: p.mpg,
+            avg: p.avg,
+            l5: p.l5,
+            dvp: p.dvp,
+            dvpRank: p.dvpRank,
+            stat,
+            line,
+            side,
+            conf,
+            label: side === "Skip" ? `${stat} ${line} (Pass)` : `${stat} ${side} ${line}`,
+            reason,
+            sVal,
+            lVal
+          };
+          p.expandedProps.push(propObj);
+          all.push(propObj);
+        });
+      });
+      return all;
+    }
+
+    const ALL_PROPS = buildAllProps();
+
+    let state = {
+      search: "",
+      game: "ALL",
+      side: "ALL",
+      layout: "props",
+      stat: "ALL",
+      conf: "ALL",
+      hideSkips: false,
+      noB2b: false,
+      sort: "conf",
+      view: "props",
+      slip: []
+    };
+
+    try {
+      const saved = localStorage.getItem("nba_whale_slip_v2_20261116");
+      if (saved) state.slip = JSON.parse(saved);
+    } catch (e) {}
+
+    function saveSlip() {
+      try {
+        localStorage.setItem("nba_whale_slip_v2_20261116", JSON.stringify(state.slip));
+      } catch (e) {}
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.remove("hidden");
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => el.classList.add("hidden"), 2200);
+    }
+
+    function confBadgeClass(conf) {
+      if (conf === "High") return "bg-emerald-500/20 text-emerald-300 border-emerald-500/40";
+      if (conf === "Med-High") return "bg-teal-500/20 text-teal-300 border-teal-500/40";
+      if (conf === "Medium") return "bg-amber-500/20 text-amber-300 border-amber-500/40";
+      if (conf === "Low-Med") return "bg-slate-700/70 text-slate-300 border-slate-600";
+      return "bg-slate-800/80 text-slate-500 border-slate-700/60";
+    }
+
+    function sideColorClass(side) {
+      if (side === "Over") return "text-emerald-400";
+      if (side === "Under") return "text-sky-400";
+      return "text-slate-400";
+    }
+
+    function defRankColor(rk) {
+      if (rk >= 21) return "text-emerald-400";
+      if (rk <= 10) return "text-rose-400";
+      return "text-amber-300";
+    }
+
+    function renderGameTabs() {
+      const container = document.getElementById("gameTabs");
+      const allBtn = `<button data-game="ALL" class="game-tab shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold transition ${state.game === "ALL" ? "bg-emerald-500 text-slate-950" : "bg-slate-900 text-slate-300 border border-slate-700/80"}">All (8)</button>`;
+      const tabs = GAMES.map(g => `
+        <button data-game="${g.id}" class="game-tab shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold transition ${state.game === g.id ? "bg-emerald-500 text-slate-950" : "bg-slate-900 text-slate-300 border border-slate-700/80"}">${g.id}</button>
+      `).join("");
+      container.innerHTML = allBtn + tabs;
+      container.querySelectorAll(".game-tab").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.game = btn.dataset.game;
+          render();
+        });
+      });
+    }
+
+    function getFilteredProps() {
+      const q = state.search.trim().toLowerCase();
+      return ALL_PROPS.filter(pr => {
+        if (state.game !== "ALL" && pr.game !== state.game) return false;
+        if (state.stat !== "ALL" && pr.stat !== state.stat) return false;
+        if (state.side !== "ALL" && pr.side !== state.side) return false;
+        if (state.hideSkips && pr.conf === "Skip") return false;
+        if (state.conf === "TOP" && pr.conf !== "High" && pr.conf !== "Med-High") return false;
+        if (state.conf !== "ALL" && state.conf !== "TOP" && pr.conf !== state.conf) return false;
+        if (state.noB2b && TEAMS[pr.team].b2b) return false;
+        if (q) {
+          const hay = `${pr.name} ${pr.team} ${pr.opp} ${pr.label} ${pr.reason}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      }).sort((a, b) => {
+        if (state.sort === "conf") {
+          const diff = CONF_ORDER[a.conf] - CONF_ORDER[b.conf];
+          if (diff !== 0) return diff;
+          return b.dvpRank - a.dvpRank;
+        }
+        if (state.sort === "pace") {
+          return (TEAMS[b.team].pace + TEAMS[b.opp].pace) - (TEAMS[a.team].pace + TEAMS[a.opp].pace);
+        }
+        if (state.sort === "dvp") {
+          return state.side === "Under" ? a.dvpRank - b.dvpRank : b.dvpRank - a.dvpRank;
+        }
+        if (state.sort === "l5diff") {
+          const da = a.line > 0 ? Math.abs(a.lVal - a.line) / a.line : 0;
+          const db = b.line > 0 ? Math.abs(b.lVal - b.line) / b.line : 0;
+          return db - da;
+        }
+        if (state.sort === "spread") {
+          const ga = Math.abs(GAMES.find(g => g.id === a.game).spread);
+          const gb = Math.abs(GAMES.find(g => g.id === b.game).spread);
+          return ga - gb;
+        }
+        return 0;
+      });
+    }
+
+    function getFilteredPlayers() {
+      const q = state.search.trim().toLowerCase();
+      return PLAYERS.filter(p => {
+        if (state.game !== "ALL" && p.game !== state.game) return false;
+        if (state.noB2b && TEAMS[p.team].b2b) return false;
+        const matchingProps = p.expandedProps.filter(pr => {
+          if (state.stat !== "ALL" && pr.stat !== state.stat) return false;
+          if (state.side !== "ALL" && pr.side !== state.side) return false;
+          if (state.hideSkips && pr.conf === "Skip") return false;
+          if (state.conf === "TOP" && pr.conf !== "High" && pr.conf !== "Med-High") return false;
+          if (state.conf !== "ALL" && state.conf !== "TOP" && pr.conf !== state.conf) return false;
+          return true;
+        });
+        if (matchingProps.length === 0) return false;
+        if (q) {
+          const hay = `${p.name} ${p.team} ${p.opp} ${p.note} ${p.lines}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      }).sort((a, b) => {
+        if (state.sort === "conf") {
+          const bestA = Math.min(...a.expandedProps.map(x => CONF_ORDER[x.conf]));
+          const bestB = Math.min(...b.expandedProps.map(x => CONF_ORDER[x.conf]));
+          if (bestA !== bestB) return bestA - bestB;
+          return b.dvpRank - a.dvpRank;
+        }
+        if (state.sort === "pace") {
+          return (TEAMS[b.team].pace + TEAMS[b.opp].pace) - (TEAMS[a.team].pace + TEAMS[a.opp].pace);
+        }
+        if (state.sort === "dvp") {
+          return b.dvpRank - a.dvpRank;
+        }
+        if (state.sort === "spread") {
+          return Math.abs(GAMES.find(g => g.id === a.game).spread) - Math.abs(GAMES.find(g => g.id === b.game).spread);
+        }
+        return 0;
+      });
+    }
+
+    function buildGameBanner() {
+      if (state.game === "ALL") return "";
+      const g = GAMES.find(x => x.id === state.game);
+      const away = TEAMS[g.away];
+      const home = TEAMS[g.home];
+      return `
+        <div class="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-3.5">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <div class="text-sm font-extrabold text-white">${g.away} @ ${g.home} <span class="text-xs font-medium text-slate-400">• ${g.time}</span></div>
+            <span class="px-2 py-0.5 rounded-md text-[11px] font-bold ${Math.abs(g.spread) >= 8 ? "bg-rose-500/20 text-rose-300" : "bg-emerald-500/20 text-emerald-300"}">${g.spreadLabel} | O/U ${g.total}</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-[11px] mb-2">
+            <div class="bg-slate-950/60 rounded-xl p-2 border border-slate-800">
+              <div class="font-bold text-slate-200">${g.away} (${away.rec}) • <span class="${away.b2b ? "text-amber-400" : "text-emerald-400"}">${away.rest}</span></div>
+              <div class="text-slate-400 mt-0.5">Pace: <strong class="text-white">${away.pace}</strong> (#${away.paceRk}) • Def: <strong class="${defRankColor(away.defRk)}">#${away.defRk}</strong> (${away.defRtg})</div>
+            </div>
+            <div class="bg-slate-950/60 rounded-xl p-2 border border-slate-800">
+              <div class="font-bold text-slate-200">${g.home} (${home.rec}) • <span class="${home.b2b ? "text-amber-400" : "text-emerald-400"}">${home.rest}</span></div>
+              <div class="text-slate-400 mt-0.5">Pace: <strong class="text-white">${home.pace}</strong> (#${home.paceRk}) • Def: <strong class="${defRankColor(home.defRk)}">#${home.defRk}</strong> (${home.defRtg})</div>
+            </div>
+          </div>
+          <div class="text-[11px] text-amber-300/90 mb-1"><strong>Injuries:</strong> ${g.injuries}</div>
+          <div class="text-[11px] text-slate-300">${g.script}</div>
+        </div>
+      `;
+    }
+
+    function renderProps() {
+      const feed = document.getElementById("propsFeed");
+      const meta = document.getElementById("resultsMeta");
+      const gameBanner = buildGameBanner();
+
+      if (state.layout === "props") {
+        const list = getFilteredProps();
+        const overCnt = list.filter(x => x.side === "Over").length;
+        const underCnt = list.filter(x => x.side === "Under").length;
+        meta.innerHTML = `<span>Showing <strong class="text-white">${list.length}</strong> of ${ALL_PROPS.length} props</span><span><strong class="text-emerald-400">${overCnt} Overs</strong> • <strong class="text-sky-400">${underCnt} Unders</strong></span>`;
+
+        if (list.length === 0) {
+          feed.innerHTML = gameBanner + `<div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center text-sm text-slate-400">No props match your current filters.</div>`;
+          return;
+        }
+
+        const cards = list.map(pr => {
+          const t = TEAMS[pr.team];
+          const opp = TEAMS[pr.opp];
+          const g = GAMES.find(x => x.id === pr.game);
+          const inSlip = state.slip.includes(pr.key);
+          const isSkip = pr.conf === "Skip";
+
+          return `
+            <div class="bg-slate-900/95 border ${isSkip ? "border-slate-800/70 opacity-75" : "border-slate-700/80"} rounded-2xl p-3.5 shadow-sm">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center flex-wrap gap-1.5">
+                    <span class="text-sm sm:text-base font-extrabold text-white">${pr.name}</span>
+                    <span class="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] font-bold text-slate-300">${pr.team} • ${pr.pos}</span>
+                    <span class="text-[11px] text-slate-400">vs ${pr.opp}</span>
+                    ${pr.status !== "Active" ? `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">${pr.status}</span>` : ""}
+                  </div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">${g.time} • ${g.spreadLabel} • O/U ${g.total} • <span class="${t.b2b ? "text-amber-400" : "text-slate-300"}">${t.rest}</span></div>
+                </div>
+                <span class="shrink-0 px-2 py-1 rounded-lg border text-[11px] font-bold ${confBadgeClass(pr.conf)}">${pr.conf}</span>
+              </div>
+
+              <div class="mt-2.5 flex items-center justify-between gap-2 bg-slate-950/70 border border-slate-800 rounded-xl px-3 py-2">
+                <div>
+                  <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">${pr.stat} Line (${pr.line})</div>
+                  <div class="text-sm font-extrabold ${sideColorClass(pr.side)}">${pr.label}</div>
+                </div>
+                ${!isSkip ? `
+                  <button data-slip-key="${pr.key}" class="slip-toggle-btn px-3 py-1.5 rounded-lg text-xs font-bold transition ${inSlip ? "bg-emerald-500 text-slate-950" : "bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30"}">
+                    ${inSlip ? "✓ In Slip" : "+ Slip"}
+                  </button>
+                ` : `<span class="text-[11px] text-slate-500 font-semibold">Pass</span>`}
+              </div>
+
+              <div class="mt-2 grid grid-cols-2 gap-1.5 text-[11px]">
+                <div class="bg-slate-950/50 rounded-lg px-2.5 py-1.5 border border-slate-800/80">
+                  <span class="text-slate-400">Opp Def:</span>
+                  <strong class="${defRankColor(opp.defRk)}">#${opp.defRk} DefRtg</strong> <span class="text-slate-500">(#${opp.oppPpgRk} PPG)</span>
+                </div>
+                <div class="bg-slate-950/50 rounded-lg px-2.5 py-1.5 border border-slate-800/80">
+                  <span class="text-slate-400">Pace:</span>
+                  <strong class="text-white">${t.pace}</strong> (#${t.paceRk}) vs <strong class="text-white">${opp.pace}</strong> (#${opp.paceRk})
+                </div>
+              </div>
+
+              <div class="mt-1.5 bg-slate-950/50 rounded-lg px-2.5 py-1.5 border border-slate-800/80 text-[11px]">
+                <span class="text-slate-400">Positional DvP:</span>
+                <strong class="${defRankColor(pr.dvpRank)}">${pr.dvp}</strong>
+              </div>
+
+              <div class="mt-2 grid grid-cols-4 gap-1.5 text-center text-[11px]">
+                <div class="bg-slate-950/60 rounded-lg py-1.5 px-1 border border-slate-800/80">
+                  <div class="text-[9px] uppercase text-slate-400">MPG</div>
+                  <div class="font-bold text-white">${pr.mpg}</div>
+                </div>
+                <div class="bg-slate-950/60 rounded-lg py-1.5 px-1 border border-slate-800/80">
+                  <div class="text-[9px] uppercase text-slate-400">Season</div>
+                  <div class="font-bold text-slate-200">${pr.sVal}</div>
+                </div>
+                <div class="bg-slate-950/60 rounded-lg py-1.5 px-1 border ${pr.lVal > pr.line ? "border-emerald-500/40" : pr.lVal < pr.line ? "border-sky-500/40" : "border-slate-800/80"}">
+                  <div class="text-[9px] uppercase text-slate-400">Last 5</div>
+                  <div class="font-extrabold ${pr.lVal > pr.line ? "text-emerald-400" : pr.lVal < pr.line ? "text-sky-400" : "text-white"}">${pr.lVal}</div>
+                </div>
+                <div class="bg-slate-950/60 rounded-lg py-1.5 px-1 border border-slate-800/80">
+                  <div class="text-[9px] uppercase text-slate-400">Line</div>
+                  <div class="font-bold text-white">${pr.line}</div>
+                </div>
+              </div>
+              <div class="mt-1 text-[10px] text-slate-400"><strong>L5 Trend:</strong> ${pr.l5}</div>
+
+              <p class="mt-1.5 text-xs text-slate-300 leading-relaxed">${pr.reason}</p>
+            </div>
+          `;
+        }).join("");
+
+        feed.innerHTML = gameBanner + cards;
+      } else {
+        const list = getFilteredPlayers();
+        meta.innerHTML = `<span>Showing <strong class="text-white">${list.length}</strong> of ${PLAYERS.length} players</span><span>All ${ALL_PROPS.length} Props Loaded</span>`;
+
+        if (list.length === 0) {
+          feed.innerHTML = gameBanner + `<div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center text-sm text-slate-400">No players match your current filters.</div>`;
+          return;
+        }
+
+        const cards = list.map(p => {
+          const t = TEAMS[p.team];
+          const opp = TEAMS[p.opp];
+          const g = GAMES.find(x => x.id === p.game);
+
+          const visibleProps = p.expandedProps.filter(pr => {
+            if (state.stat !== "ALL" && pr.stat !== state.stat) return false;
+            if (state.side !== "ALL" && pr.side !== state.side) return false;
+            if (state.hideSkips && pr.conf === "Skip") return false;
+            if (state.conf === "TOP" && pr.conf !== "High" && pr.conf !== "Med-High") return false;
+            if (state.conf !== "ALL" && state.conf !== "TOP" && pr.conf !== state.conf) return false;
+            return true;
+          });
+
+          const propRows = visibleProps.map(pr => {
+            const inSlip = state.slip.includes(pr.key);
+            const isSkip = pr.conf === "Skip";
+            return `
+              <div class="flex items-center justify-between gap-2 bg-slate-950/70 border border-slate-800 rounded-xl px-2.5 py-2">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs font-extrabold ${sideColorClass(pr.side)}">${pr.label}</span>
+                    <span class="px-1.5 py-0.5 rounded border text-[10px] font-bold ${confBadgeClass(pr.conf)}">${pr.conf}</span>
+                  </div>
+                  <div class="text-[10px] text-slate-400 mt-0.5 truncate">Season: ${pr.sVal} | L5: ${pr.lVal}</div>
+                </div>
+                ${!isSkip ? `
+                  <button data-slip-key="${pr.key}" class="slip-toggle-btn shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${inSlip ? "bg-emerald-500 text-slate-950" : "bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30"}">
+                    ${inSlip ? "✓ Added" : "+ Slip"}
+                  </button>
+                ` : `<span class="text-[10px] text-slate-500 font-semibold shrink-0">Pass</span>`}
+              </div>
+            `;
+          }).join("");
+
+          return `
+            <div class="bg-slate-900/95 border border-slate-700/80 rounded-2xl p-3.5 shadow-sm">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center flex-wrap gap-1.5">
+                    <span class="text-sm sm:text-base font-extrabold text-white">${p.name}</span>
+                    <span class="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] font-bold text-slate-300">${p.team} • ${p.pos}</span>
+                    <span class="text-[11px] text-slate-400">vs ${p.opp}</span>
+                    ${p.status !== "Active" ? `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">${p.status}</span>` : ""}
+                  </div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">${g.time} • ${g.spreadLabel} • O/U ${g.total} • <span class="${t.b2b ? "text-amber-400" : "text-slate-300"}">${t.rest}</span></div>
+                </div>
+              </div>
+
+              <div class="mt-2 grid grid-cols-2 gap-1.5 text-[11px]">
+                <div class="bg-slate-950/50 rounded-lg px-2.5 py-1.5 border border-slate-800/80">
+                  <span class="text-slate-400">Opp Def:</span>
+                  <strong class="${defRankColor(opp.defRk)}">#${opp.defRk} DefRtg</strong> <span class="text-slate-500">(#${opp.oppPpgRk} PPG)</span>
+                </div>
+                <div class="bg-slate-950/50 rounded-lg px-2.5 py-1.5 border border-slate-800/80">
+                  <span class="text-slate-400">Pace:</span>
+                  <strong class="text-white">${t.pace}</strong> (#${t.paceRk}) vs <strong class="text-white">${opp.pace}</strong> (#${opp.paceRk})
+                </div>
+              </div>
+
+              <div class="mt-1.5 bg-slate-950/50 rounded-lg px-2.5 py-1.5 border border-slate-800/80 text-[11px]">
+                <span class="text-slate-400">Positional DvP:</span>
+                <strong class="${defRankColor(p.dvpRank)}">${p.dvp}</strong>
+              </div>
+
+              <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-300">
+                <span><strong class="text-slate-400">MPG:</strong> ${p.mpg}</span>
+                <span><strong class="text-slate-400">Season:</strong> ${p.avg}</span>
+                <span><strong class="text-slate-400">L5:</strong> ${p.l5}</span>
+              </div>
+
+              <div class="mt-2.5 space-y-1.5">${propRows}</div>
+              <p class="mt-2 text-xs text-slate-300 leading-relaxed">${p.note}</p>
+            </div>
+          `;
+        }).join("");
+
+        feed.innerHTML = gameBanner + cards;
+      }
+
+      feed.querySelectorAll(".slip-toggle-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          toggleSlip(btn.dataset.slipKey);
+        });
+      });
+    }
+
+    function renderMatchups() {
+      const container = document.getElementById("matchupsView");
+      document.getElementById("resultsMeta").innerHTML = `<span>8 Games Today • Pace, Def Rtg, Rest &amp; Injury Cheat Sheet</span>`;
+      container.innerHTML = GAMES.map(g => {
+        const away = TEAMS[g.away];
+        const home = TEAMS[g.home];
+        const combPace = ((away.pace + home.pace) / 2).toFixed(1);
+        return `
+          <div class="bg-slate-900 border border-slate-700/80 rounded-2xl p-3.5">
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <div>
+                <div class="text-sm font-extrabold text-white">${g.away} @ ${g.home}</div>
+                <div class="text-[11px] text-slate-400">${g.time} • ${g.ml}</div>
+              </div>
+              <div class="text-right">
+                <div class="text-xs font-extrabold text-emerald-400">${g.spreadLabel} | O/U ${g.total}</div>
+                <div class="text-[10px] text-slate-400">Avg Pace: ${combPace} • Blowout: ${g.blowout}</div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-[11px] mb-2">
+              <div class="bg-slate-950/60 rounded-xl p-2 border border-slate-800">
+                <div class="font-bold text-white">${away.name} (${away.rec})</div>
+                <div class="text-slate-400">Pace: ${away.pace} (#${away.paceRk}) • <span class="${away.b2b ? "text-amber-400" : "text-emerald-400"}">${away.rest}</span></div>
+                <div class="text-slate-400">Def Rtg: <strong class="${defRankColor(away.defRk)}">#${away.defRk}</strong> (${away.defRtg}) • Opp PPG: #${away.oppPpgRk}</div>
+              </div>
+              <div class="bg-slate-950/60 rounded-xl p-2 border border-slate-800">
+                <div class="font-bold text-white">${home.name} (${home.rec})</div>
+                <div class="text-slate-400">Pace: ${home.pace} (#${home.paceRk}) • <span class="${home.b2b ? "text-amber-400" : "text-emerald-400"}">${home.rest}</span></div>
+                <div class="text-slate-400">Def Rtg: <strong class="${defRankColor(home.defRk)}">#${home.defRk}</strong> (${home.defRtg}) • Opp PPG: #${home.oppPpgRk}</div>
+              </div>
+            </div>
+            <div class="text-[11px] text-amber-300/90 mb-1"><strong>Injuries:</strong> ${g.injuries}</div>
+            <div class="text-xs text-slate-300 mb-2.5">${g.script}</div>
+            <button data-jump-game="${g.id}" class="jump-game-btn w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-xs transition">View ${g.id} Player Props →</button>
+          </div>
+        `;
+      }).join("");
+
+      container.querySelectorAll(".jump-game-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.game = btn.dataset.jumpGame;
+          state.view = "props";
+          render();
+        });
+      });
+    }
+
+    function injBadge(status) {
+      if (status === "OUT") return "bg-rose-500/20 text-rose-300 border-rose-500/40";
+      if (status === "Doubtful") return "bg-orange-500/20 text-orange-300 border-orange-500/40";
+      if (status === "Questionable") return "bg-amber-500/20 text-amber-300 border-amber-500/40";
+      if (status === "Available") return "bg-emerald-500/20 text-emerald-300 border-emerald-500/40";
+      return "bg-slate-700/60 text-slate-300 border-slate-600";
+    }
+
+    function renderInjuries() {
+      const container = document.getElementById("injuriesView");
+      document.getElementById("resultsMeta").innerHTML = `<span>Official NBA Injury Report (Nov 16, 2:30 PM ET) • All 8 Games</span>`;
+      container.innerHTML = INJURIES.map(item => {
+        const g = GAMES.find(x => x.id === item.game);
+        const renderTeamList = (team, list) => `
+          <div class="bg-slate-950/60 rounded-xl p-2.5 border border-slate-800">
+            <div class="text-xs font-extrabold text-white mb-1.5">${team} <span class="text-[10px] font-medium text-slate-400">(${TEAMS[team].rest})</span></div>
+            <div class="space-y-1.5">
+              ${list.map(pl => `
+                <div class="flex items-start justify-between gap-2 text-[11px]">
+                  <div>
+                    <span class="font-semibold text-slate-200">${pl.name}</span>
+                    <div class="text-[10px] text-slate-400">${pl.reason}</div>
+                  </div>
+                  <span class="shrink-0 px-1.5 py-0.5 rounded border text-[10px] font-bold ${injBadge(pl.status)}">${pl.status}</span>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `;
+        return `
+          <div class="bg-slate-900 border border-slate-700/80 rounded-2xl p-3.5">
+            <div class="flex items-center justify-between gap-2 mb-2.5">
+              <div class="text-sm font-extrabold text-white">${item.game} <span class="text-xs font-medium text-slate-400">• ${item.time}</span></div>
+              <span class="text-xs font-bold text-emerald-400">${g.spreadLabel} | O/U ${g.total}</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2.5">
+              ${renderTeamList(item.awayTeam, item.awayList)}
+              ${renderTeamList(item.homeTeam, item.homeList)}
+            </div>
+            <div class="bg-emerald-500/10 border border-emerald-500/25 rounded-xl px-3 py-2 text-[11px] text-emerald-200 mb-2.5">
+              <strong class="text-emerald-400">Who Benefits:</strong> ${item.beneficiaries}
+            </div>
+            <button data-jump-game="${item.game}" class="jump-inj-game-btn w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-xs transition">View ${item.game} Props →</button>
+          </div>
+        `;
+      }).join("");
+
+      container.querySelectorAll(".jump-inj-game-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.game = btn.dataset.jumpGame;
+          state.view = "props";
+          render();
+        });
+      });
+    }
+
+    function toggleSlip(key) {
+      if (state.slip.includes(key)) {
+        state.slip = state.slip.filter(x => x !== key);
+        showToast("Removed from slip");
+      } else {
+        state.slip.push(key);
+        showToast("Added prop to slip");
+      }
+      saveSlip();
+      updateSlipBar();
+      renderProps();
+    }
+
+    function updateSlipBar() {
+      const count = state.slip.length;
+      document.getElementById("slipCountBadge").textContent = count;
+      const sub = document.getElementById("slipSubtext");
+      if (count === 0) {
+        sub.textContent = "Tap + Slip on any Over or Under to build";
+      } else {
+        const names = state.slip.map(key => {
+          const pr = ALL_PROPS.find(x => x.key === key);
+          if (!pr) return "";
+          const last = pr.name.split(" ").slice(-1)[0];
+          const sChar = pr.side === "Over" ? "O" : "U";
+          return `${last} ${pr.stat} ${sChar}${pr.line}`;
+        }).filter(Boolean).join(" • ");
+        sub.textContent = names;
+      }
+    }
+
+    function renderSlipModal() {
+      const list = document.getElementById("slipList");
+      if (state.slip.length === 0) {
+        list.innerHTML = `<div class="text-center text-xs text-slate-400 py-8">Your slip is empty. Tap <strong>+ Slip</strong> on any Over or Under prop to add it.</div>`;
+        return;
+      }
+      list.innerHTML = state.slip.map(key => {
+        const pr = ALL_PROPS.find(x => x.key === key);
+        if (!pr) return "";
+        const g = GAMES.find(x => x.id === pr.game);
+        const t = TEAMS[pr.team];
+        return `
+          <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-3 flex items-start justify-between gap-2">
+            <div>
+              <div class="text-xs font-extrabold text-white">${pr.name} (${pr.team}) — <span class="${sideColorClass(pr.side)}">${pr.label}</span></div>
+              <div class="text-[11px] text-slate-400 mt-0.5">${pr.game} • ${g.spreadLabel} • ${t.rest} • ${pr.conf}</div>
+              <div class="text-[11px] text-slate-300 mt-1">${pr.dvp}</div>
+            </div>
+            <button data-remove-key="${pr.key}" class="remove-slip-btn px-2 py-1 rounded-lg bg-slate-800 text-slate-400 hover:text-rose-400 text-xs font-bold">✕</button>
+          </div>
+        `;
+      }).join("");
+
+      list.querySelectorAll(".remove-slip-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const key = btn.dataset.removeKey;
+          state.slip = state.slip.filter(x => x !== key);
+          saveSlip();
+          updateSlipBar();
+          renderSlipModal();
+          renderProps();
+        });
+      });
+    }
+
+    function copySlipText() {
+      if (state.slip.length === 0) {
+        showToast("Slip is empty");
+        return;
+      }
+      const lines = state.slip.map((key, idx) => {
+        const pr = ALL_PROPS.find(x => x.key === key);
+        return pr ? `${idx + 1}. ${pr.name} (${pr.team} vs ${pr.opp}) — ${pr.label} [${pr.conf}]` : "";
+      }).filter(Boolean);
+      const text = `ATL Picks Prop Slip (Nov 16):
+` + lines.join("\n");
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast("Slip copied!")).catch(() => fallbackCopy(text));
+      } else {
+        fallbackCopy(text);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+        showToast("Slip copied!");
+      } catch (e) {
+        showToast("Copy failed");
+      }
+      document.body.removeChild(ta);
+    }
+
+    function render() {
+      renderGameTabs();
+      updateSlipBar();
+
+      const propsBtn = document.getElementById("viewToggleProps");
+      const matchBtn = document.getElementById("viewToggleMatchups");
+      const injBtn = document.getElementById("viewToggleInjuries");
+      const propsFeed = document.getElementById("propsFeed");
+      const matchView = document.getElementById("matchupsView");
+      const injView = document.getElementById("injuriesView");
+      const subFilters = document.getElementById("subFilters");
+      const gameTabs = document.getElementById("gameTabs");
+
+      const activeCls = "px-2 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition";
+      const idleCls = "px-2 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+
+      propsBtn.className = state.view === "props" ? activeCls : idleCls;
+      matchBtn.className = state.view === "matchups" ? activeCls : idleCls;
+      injBtn.className = state.view === "injuries" ? activeCls : idleCls;
+
+      propsFeed.classList.toggle("hidden", state.view !== "props");
+      matchView.classList.toggle("hidden", state.view !== "matchups");
+      injView.classList.toggle("hidden", state.view !== "injuries");
+      subFilters.classList.toggle("hidden", state.view !== "props");
+      gameTabs.classList.toggle("hidden", state.view !== "props");
+
+      if (state.view === "props") renderProps();
+      else if (state.view === "matchups") renderMatchups();
+      else renderInjuries();
+    }
+
+    const searchInput = document.getElementById("searchInput");
+    const clearSearchBtn = document.getElementById("clearSearchBtn");
+    searchInput.addEventListener("input", (e) => {
+      state.search = e.target.value;
+      clearSearchBtn.classList.toggle("hidden", !state.search);
+      renderProps();
+    });
+    clearSearchBtn.addEventListener("click", () => {
+      state.search = "";
+      searchInput.value = "";
+      clearSearchBtn.classList.add("hidden");
+      renderProps();
+    });
+
+    document.getElementById("hideSkipsBtn").addEventListener("click", (e) => {
+      state.hideSkips = !state.hideSkips;
+      e.target.className = state.hideSkips
+        ? "shrink-0 px-2.5 py-2 rounded-xl text-xs font-semibold border border-emerald-500 bg-emerald-500/20 text-emerald-300 transition"
+        : "shrink-0 px-2.5 py-2 rounded-xl text-xs font-semibold border border-slate-700 bg-slate-900 text-slate-300 transition";
+      renderProps();
+    });
+
+    document.getElementById("noB2bBtn").addEventListener("click", (e) => {
+      state.noB2b = !state.noB2b;
+      e.target.className = state.noB2b
+        ? "shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-emerald-500 bg-emerald-500/20 text-emerald-300 transition"
+        : "shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/80 bg-slate-900 text-slate-300 transition";
+      renderProps();
+    });
+
+    document.getElementById("sideFilter").addEventListener("change", (e) => {
+      state.side = e.target.value;
+      renderProps();
+    });
+    document.getElementById("layoutSelect").addEventListener("change", (e) => {
+      state.layout = e.target.value;
+      renderProps();
+    });
+    document.getElementById("statFilter").addEventListener("change", (e) => {
+      state.stat = e.target.value;
+      renderProps();
+    });
+    document.getElementById("confFilter").addEventListener("change", (e) => {
+      state.conf = e.target.value;
+      renderProps();
+    });
+    document.getElementById("sortSelect").addEventListener("change", (e) => {
+      state.sort = e.target.value;
+      renderProps();
+    });
+
+    document.getElementById("viewToggleProps").addEventListener("click", () => {
+      state.view = "props";
+      render();
+    });
+    document.getElementById("viewToggleMatchups").addEventListener("click", () => {
+      state.view = "matchups";
+      render();
+    });
+    document.getElementById("viewToggleInjuries").addEventListener("click", () => {
+      state.view = "injuries";
+      render();
+    });
+
+    document.getElementById("openSlipBtn").addEventListener("click", () => {
+      renderSlipModal();
+      document.getElementById("slipModal").classList.remove("hidden");
+    });
+    document.getElementById("closeSlipBtn").addEventListener("click", () => {
+      document.getElementById("slipModal").classList.add("hidden");
+    });
+    document.getElementById("clearSlipBtn").addEventListener("click", () => {
+      state.slip = [];
+      saveSlip();
+      updateSlipBar();
+      renderSlipModal();
+      renderProps();
+    });
+    document.getElementById("copySlipBtn").addEventListener("click", copySlipText);
+
+    render();
+  </script>
+</body>
+</html>
